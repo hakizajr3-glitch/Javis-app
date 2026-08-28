@@ -1,0 +1,28 @@
+# Environment variables (contains API keys - NEVER commit)
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+venv/
+venv314/
+.venv/
+
+# Database files
+*.db
+*.sqlite3
+chroma_db/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test outputs
+/tmp/

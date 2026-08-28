@@ -1,0 +1,17 @@
+{
+  "name": "my-athena-v1",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "electron:dev": "cd jarvis-electron && npm run dev",
+    "tauri:dev": "cd jarvis-tauri && npm run tauri dev",
+    "browser:sidecar": "tsx jarvis-core/src/browser-control/playwrightSidecar.ts",
+    "browser:sidecar:headed": "tsx jarvis-core/src/browser-control/playwrightSidecar.ts --headed"
+  },
+  "dependencies": {
+    "playwright": "^1.62.1"
+  },
+  "devDependencies": {
+    "tsx": "^4.23.12"
+  }
+}

@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JARVIS — Just A Rather Very Intelligent System</title>
+  <meta name="description" content="Your AI-powered desktop assistant. Works with any AI provider — Gemini, OpenAI, Claude, Groq, Ollama, and more. macOS. Open source.">
+  <meta property="og:title" content="JARVIS — Just A Rather Very Intelligent System">
+  <meta property="og:description" content="Your AI-powered desktop assistant. Works with any AI provider. macOS. Open source.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://jervis-app.run.place">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%230a0e1a' stroke='%2300d4ee' stroke-width='2'/><circle cx='50' cy='50' r='30' fill='none' stroke='%2300d4ee' stroke-width='1' opacity='0.5'/><circle cx='50' cy='50' r='15' fill='%2300d4ee' opacity='0.3'/></svg>">
+  <style>
+    /* ─── Reset & Base ──────────────────────────────────────────── */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #0a0e1a;
+      --surface: #0f1525;
+      --card: #131a2e;
+      --border: #1e2a4a;
+      --primary: #00d4ee;
+      --primary-dim: #00a8c4;
+      --accent: #00f5d4;
+      --text: #e8ecf4;
+      --text-dim: #8b95b0;
+      --text-muted: #5a6580;
+      --radius: 12px;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', Menlo, monospace;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    a { color: var(--primary); text-decoration: none; transition: opacity 0.2s; }
+    a:hover { opacity: 0.8; }
+
+    /* ─── Background Effects ────────────────────────────────────── */
+    .bg-grid {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(0, 212, 238, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 212, 238, 0.03) 1px, transparent 1px);
+      background-size: 50px 50px;
+    }
+    .bg-glow {
+      position: fixed; top: -20%; left: 50%; transform: translateX(-50%);
+      width: 800px; height: 600px; z-index: 0; pointer-events: none;
+      background: radial-gradient(ellipse at center, rgba(0, 212, 238, 0.08) 0%, transparent 70%);
+    }
+
+    /* ─── Navigation ────────────────────────────────────────────── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(10, 14, 26, 0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      max-width: 1200px; margin: 0 auto; padding: 0 24px;
+      height: 64px; display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px;
+      font-family: var(--font-mono); font-weight: 700; font-size: 16px;
+      color: var(--primary); letter-spacing: 2px;
+    }
+    .nav-logo-icon {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: radial-gradient(circle, var(--primary) 30%, transparent 70%);
+      border: 1px solid var(--primary);
+      box-shadow: 0 0 12px rgba(0, 212, 238, 0.4);
+    }
+    .nav-links { display: flex; align-items: center; gap: 28px; }
+    .nav-links a {
+      color: var(--text-dim); font-size: 14px; font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); opacity: 1; }
+    .nav-cta {
+      padding: 8px 18px; border-radius: 8px;
+      background: rgba(0, 212, 238, 0.1); border: 1px solid rgba(0, 212, 238, 0.3);
+      color: var(--primary) !important; font-weight: 600;
+    }
+    .nav-cta:hover { background: rgba(0, 212, 238, 0.2); }
+
+    /* ─── Hero ──────────────────────────────────────────────────── */
+    .hero {
+      position: relative; z-index: 1;
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      text-align: center; padding: 120px 24px 80px;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 16px; border-radius: 100px;
+      background: rgba(0, 212, 238, 0.08); border: 1px solid rgba(0, 212, 238, 0.2);
+      font-size: 13px; color: var(--primary); font-family: var(--font-mono);
+      margin-bottom: 32px;
+    }
+    .hero-badge .dot {
+      width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
+      box-shadow: 0 0 8px var(--accent); animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    .hero h1 {
+      font-size: clamp(40px, 7vw, 80px); font-weight: 900;
+      letter-spacing: -2px; line-height: 1.05; margin-bottom: 24px;
+      background: linear-gradient(135deg, #ffffff 0%, var(--primary) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero h1 .sub {
+      display: block; font-size: clamp(16px, 2vw, 22px); font-weight: 400;
+      color: var(--text-dim); letter-spacing: 4px; margin-top: 12px;
+      -webkit-text-fill-color: var(--text-dim);
+    }
+    .hero p {
+      font-size: clamp(16px, 2vw, 20px); color: var(--text-dim);
+      max-width: 600px; margin: 0 auto 40px; line-height: 1.7;
+    }
+    .hero-buttons {
+      display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 14px 28px; border-radius: 10px; font-size: 15px; font-weight: 600;
+      transition: all 0.2s; cursor: pointer; border: none;
+    }
+    .btn-primary {
+      background: var(--primary); color: var(--bg);
+      box-shadow: 0 0 24px rgba(0, 212, 238, 0.3);
+    }
+    .btn-primary:hover { box-shadow: 0 0 32px rgba(0, 212, 238, 0.5); transform: translateY(-1px); }
+    .btn-secondary {
+      background: var(--card); color: var(--text); border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { border-color: var(--primary); color: var(--primary); }
+
+    /* ─── Sections ──────────────────────────────────────────────── */
+    section { position: relative; z-index: 1; padding: 100px 24px; }
+    .section-inner { max-width: 1200px; margin: 0 auto; }
+    .section-label {
+      font-family: var(--font-mono); font-size: 13px; color: var(--primary);
+      letter-spacing: 3px; text-transform: uppercase; margin-bottom: 12px;
+    }
+    .section-title {
+      font-size: clamp(28px, 4vw, 44px); font-weight: 800; letter-spacing: -1px;
+      margin-bottom: 16px; line-height: 1.2;
+    }
+    .section-desc {
+      font-size: 17px; color: var(--text-dim); max-width: 600px; margin-bottom: 48px;
+    }
+
+    /* ─── Provider Grid ─────────────────────────────────────────── */
+    .providers-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+    }
+    .provider-card {
+      padding: 24px; border-radius: var(--radius);
+      background: var(--card); border: 1px solid var(--border);
+      transition: all 0.3s;
+    }
+    .provider-card:hover {
+      border-color: rgba(0, 212, 238, 0.3);
+      box-shadow: 0 0 20px rgba(0, 212, 238, 0.08);
+      transform: translateY(-2px);
+    }
+    .provider-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+    .provider-card p { font-size: 13px; color: var(--text-dim); line-height: 1.5; margin-bottom: 12px; }
+    .provider-badges { display: flex; gap: 8px; flex-wrap: wrap; }
+    .badge {
+      font-size: 11px; padding: 3px 10px; border-radius: 100px;
+      font-family: var(--font-mono); font-weight: 500;
+    }
+    .badge-free { background: rgba(0, 245, 212, 0.1); color: var(--accent); border: 1px solid rgba(0, 245, 212, 0.2); }
+    .badge-local { background: rgba(168, 85, 247, 0.1); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.2); }
+    .badge-paid { background: rgba(139, 149, 176, 0.1); color: var(--text-dim); border: 1px solid var(--border); }
+
+    /* ─── Features ──────────────────────────────────────────────── */
+    .features-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 24px;
+    }
+    .feature-card {
+      padding: 32px; border-radius: var(--radius);
+      background: var(--card); border: 1px solid var(--border);
+      transition: all 0.3s;
+    }
+    .feature-card:hover { border-color: rgba(0, 212, 238, 0.2); }
+    .feature-icon {
+      width: 48px; height: 48px; border-radius: 12px;
+      background: rgba(0, 212, 238, 0.08); border: 1px solid rgba(0, 212, 238, 0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; margin-bottom: 20px;
+    }
+    .feature-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+    .feature-card p { font-size: 14px; color: var(--text-dim); line-height: 1.6; }
+
+    /* ─── How It Works ──────────────────────────────────────────── */
+    .steps {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 32px; counter-reset: step;
+    }
+    .step {
+      position: relative; padding: 32px; border-radius: var(--radius);
+      background: var(--card); border: 1px solid var(--border);
+    }
+    .step::before {
+      counter-increment: step; content: counter(step);
+      position: absolute; top: -16px; left: 32px;
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--primary); color: var(--bg);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 16px; font-family: var(--font-mono);
+      box-shadow: 0 0 16px rgba(0, 212, 238, 0.3);
+    }
+    .step h3 { font-size: 17px; font-weight: 700; margin-bottom: 8px; margin-top: 4px; }
+    .step p { font-size: 14px; color: var(--text-dim); line-height: 1.6; }
+
+    /* ─── FAQ ───────────────────────────────────────────────────── */
+    .faq-list { max-width: 800px; margin: 0 auto; }
+    .faq-item {
+      border-bottom: 1px solid var(--border); padding: 24px 0;
+    }
+    .faq-item summary {
+      font-size: 17px; font-weight: 600; cursor: pointer; list-style: none;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-item summary::after {
+      content: '+'; font-size: 24px; color: var(--primary); transition: transform 0.2s;
+    }
+    .faq-item[open] summary::after { transform: rotate(45deg); }
+    .faq-item p {
+      margin-top: 16px; font-size: 15px; color: var(--text-dim); line-height: 1.7;
+    }
+
+    /* ─── CTA ───────────────────────────────────────────────────── */
+    .cta {
+      text-align: center; padding: 120px 24px;
+    }
+    .cta h2 {
+      font-size: clamp(28px, 5vw, 48px); font-weight: 800; margin-bottom: 20px;
+      background: linear-gradient(135deg, #ffffff 0%, var(--primary) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .cta p { font-size: 18px; color: var(--text-dim); margin-bottom: 40px; }
+
+    /* ─── Footer ────────────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border); padding: 48px 24px;
+      text-align: center; position: relative; z-index: 1;
+    }
+    .footer-inner { max-width: 1200px; margin: 0 auto; }
+    .footer-links {
+      display: flex; gap: 24px; justify-content: center; margin-bottom: 24px; flex-wrap: wrap;
+    }
+    .footer-links a { color: var(--text-dim); font-size: 14px; }
+    .footer-copy { font-size: 13px; color: var(--text-muted); font-family: var(--font-mono); }
+
+    /* ─── Responsive ────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .hero h1 { font-size: 42px; }
+      .features-grid, .providers-grid, .steps { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="bg-glow"></div>
+
+  <!-- ─── Navigation ─────────────────────────────────────────────── -->
+  <nav>
+    <div class="nav-inner">
+      <a href="#home" class="nav-logo">
+        <div class="nav-logo-icon"></div>
+        JARVIS
+      </a>
+      <div class="nav-links">
+        <a href="#providers">Providers</a>
+        <a href="#features">Features</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="#faq">FAQ</a>
+        <a href="https://github.com/hakizajr3-glitch/J.R.R.V.I.S" target="_blank">GitHub</a>
+        <a href="https://github.com/hakizajr3-glitch/J.R.R.V.I.S/releases" target="_blank" class="nav-cta">Download</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ─── Hero ───────────────────────────────────────────────────── -->
+  <div class="hero" id="home">
+    <div>
+      <div class="hero-badge">
+        <span class="dot"></span>
+        Open Source · macOS · MIT License
+      </div>
+      <h1>
+        J.A.R.V.I.S.
+        <span class="sub">JUST A RATHER VERY INTELLIGENT SYSTEM</span>
+      </h1>
+      <p>
+        Your AI-powered desktop assistant. Download, open, connect your AI provider — done.
+        Works with Gemini, OpenAI, Claude, Groq, Ollama, and 8+ more providers.
+      </p>
+      <div class="hero-buttons">
+        <a href="https://github.com/hakizajr3-glitch/J.R.R.V.I.S/releases" target="_blank" class="btn btn-primary">
+          Download for macOS
+        </a>
+        <a href="https://github.com/hakizajr3-glitch/J.R.R.V.I.S" target="_blank" class="btn btn-secondary">
+          View on GitHub
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Providers ──────────────────────────────────────────────── -->
+  <section id="providers">
+    <div class="section-inner">
+      <div class="section-label">AI PROVIDERS</div>
+      <h2 class="section-title">Works with any AI provider</h2>
+      <p class="section-desc">
+        Pick your favorite. Switch anytime. JARVIS supports 12+ providers out of the box,
+        including free tiers and fully local options.
+      </p>
+      <div class="providers-grid">
+        <div class="provider-card">
+          <h3>Google Gemini</h3>
+          <p>Fast and capable models from Google. Free tier available.</p>
+          <div class="provider-badges">
+            <span class="badge badge-free">Free Tier</span>
+          </div>
+        </div>
+        <div class="provider-card">
+          <h3>OpenAI</h3>
+          <p>GPT-4o, o1, o3, GPT-4.1. Industry standard.</p>
+          <div class="provider-badges">
+            <span class="badge badge-paid">Paid</span>
+          </div>
+        </div>
+        <div class="provider-card">
+          <h3>Anthropic Claude</h3>
+          <p>Claude 3.5 Sonnet, Claude 4, Opus. Excellent reasoning.</p>
+          <div class="provider-badges">
+            <span class="badge badge-paid">Paid</span>
+          </div>
+        </div>
+        <div class="provider-card">
+          <h3>OpenRouter</h3>
+          <p>200+ models from all providers with one API key.</p>
+          <div class="provider-badges">
+            <span class="badge badge-free">Free Models</span>
+          </div>
+        </div>
+        <div class="provider-card">
+          <h3>Groq</h3>
+          <p>Ultra-fast inference. Free tier with generous limits.</p>
+          <div class="provider-badges">
+            <span class="badge badge-free">Free Tier</span>
+          </div>
+        </div>
+        <div class="provider-card">
+          <h3>Mistral AI</h3>
+          <p>Mistral Large, Codestral, and open-weight models.</p>
+          <div class="provider-badges">
+            <span class="badge badge-free">Free Tier</span>
+          </div>
+        </div>
+        <div class="provider-card">
+          <h3>DeepSeek</h3>
+          <p>DeepSeek R1 and V3. Excellent reasoning at low cost.</p>
+          <div class="provider-badges">
+            <span class="badge badge-paid">Low Cost</span>
+          </div>
+        </div>
+        <div class="provider-card">
+          <h3>Together AI</h3>
+          <p>Hosted open-source models. Llama, Qwen, DeepSeek.</p>
+          <div class="provider-badges">
+            <span class="badge badge-free">Free Credits</span>
+          </div>
+        </div>
+        <div class="provider-card">
+          <h3>Fireworks AI</h3>
+          <p>Fast inference for open-source models.</p>
+          <div class="provider-badges">
+            <span class="badge badge-free">Free Credits</span>
+          </div>
+        </div>
+        <div class="provider-card">
+          <h3>Ollama</h3>
+          <p>Run models locally on your machine. No API key needed.</p>
+          <div class="provider-badges">
+            <span class="badge badge-free">Free</span>
+            <span class="badge badge-local">Local</span>
+          </div>
+        </div>
+        <div class="provider-card">
+          <h3>xAI Grok</h3>
+          <p>Grok 2 and Grok 3. Real-time knowledge.</p>
+          <div class="provider-badges">
+            <span class="badge badge-paid">Paid</span>
+          </div>
+        </div>
+        <div class="provider-card">
+          <h3>Perplexity</h3>
+          <p>Online models with real-time web search built in.</p>
+          <div class="provider-badges">
+            <span class="badge badge-paid">Paid</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Features ───────────────────────────────────────────────── -->
+  <section id="features">
+    <div class="section-inner">
+      <div class="section-label">FEATURES</div>
+      <h2 class="section-title">Everything you need in an AI assistant</h2>
+      <p class="section-desc">
+        JARVIS is not just a chat interface. It's a full agentic platform with voice,
+        multi-agent orchestration, and desktop automation.
+      </p>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🎙️</div>
+          <h3>Voice Interaction</h3>
+          <p>Speech-to-text and text-to-speech built in. Talk to JARVIS naturally —
+          browser-native or ElevenLabs voices.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🤖</div>
+          <h3>Multi-Agent Workforce</h3>
+          <p>Create specialized AI agents with departments, roles, and isolated workspaces.
+          16 departments, 50+ roles built in.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🧠</div>
+          <h3>Knowledge Graph</h3>
+          <p>Entity-relationship memory that agents can query and build on.
+          Your AI remembers context across conversations.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🖥️</div>
+          <h3>Desktop Automation</h3>
+          <p>Mouse, keyboard, and screen capture via Tauri.
+          JARVIS can interact with any app on your Mac.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🌐</div>
+          <h3>Browser Control</h3>
+          <p>Playwright-based web automation. JARVIS can navigate websites,
+          fill forms, and extract data.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔒</div>
+          <h3>Local-First & Private</h3>
+          <p>All data stays on your machine. No telemetry, no cloud, no tracking.
+          Your conversations are yours.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <h3>Autonomy Levels</h3>
+          <p>Control how much JARVIS can do: Observe, Suggest, Act, Verify, Learn.
+          You're always in control.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🎨</div>
+          <h3>HUD Interface</h3>
+          <p>A beautiful heads-up display inspired by Iron Man's JARVIS.
+          Arc reactor aesthetics, real-time data, animated connections.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📦</div>
+          <h3>Auto-Updates</h3>
+          <p>JARVIS updates itself automatically. New providers, new features,
+          bug fixes — all without lifting a finger.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── How It Works ───────────────────────────────────────────── -->
+  <section id="how-it-works">
+    <div class="section-inner">
+      <div class="section-label">GETTING STARTED</div>
+      <h2 class="section-title">Up and running in 3 steps</h2>
+      <p class="section-desc">
+        No terminal, no config files, no build tools. Just download and open.
+      </p>
+      <div class="steps">
+        <div class="step">
+          <h3>Download</h3>
+          <p>Grab the <code>.dmg</code> from GitHub Releases. Apple Silicon and Intel Macs
+          both supported. Drag to Applications.</p>
+        </div>
+        <div class="step">
+          <h3>Pick a Provider</h3>
+          <p>The setup wizard appears on first launch. Choose any AI provider —
+          Gemini (free), OpenAI, Claude, Groq, Ollama (local), or 8+ others.</p>
+        </div>
+        <div class="step">
+          <h3>Start Talking</h3>
+          <p>Enter your API key, click Connect, and JARVIS is ready.
+          Type or speak — your AI assistant is live.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── FAQ ────────────────────────────────────────────────────── -->
+  <section id="faq">
+    <div class="section-inner">
+      <div class="section-label">FAQ</div>
+      <h2 class="section-title">Frequently asked questions</h2>
+      <div class="faq-list">
+        <details class="faq-item">
+          <summary>What is JARVIS?</summary>
+          <p>JARVIS (Just A Rather Very Intelligent System) is an open-source AI desktop
+          assistant for macOS. It works with 12+ AI providers, supports voice interaction,
+          and includes a multi-agent workforce system. Think of it as your personal AI
+          command center — inspired by Iron Man's JARVIS.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Is JARVIS free?</summary>
+          <p>JARVIS itself is completely free and open source (MIT license). The AI providers
+          you use may have their own pricing — but many offer free tiers (Gemini, Groq,
+          Mistral, OpenRouter, Together, Fireworks) and Ollama lets you run models locally
+          for free with no API key.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Which macOS versions are supported?</summary>
+          <p>JARVIS requires macOS 12.0 (Monterey) or later. Both Apple Silicon (M1/M2/M3/M4)
+          and Intel Macs are supported with separate builds.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Will Windows and Linux be supported?</summary>
+          <p>Yes — Windows and Linux support is coming soon. The app is built with Tauri,
+          which supports all three platforms. We're starting with macOS and expanding
+          based on community demand.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Is my data private?</summary>
+          <p>Yes. JARVIS is local-first — all your data (conversations, memory, agent
+          workspaces) stays on your machine. No telemetry, no analytics, no cloud sync.
+          Your API keys are stored locally and only sent to your chosen AI provider.
+          For maximum privacy, use the Ollama provider to run models entirely locally.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Can I use multiple AI providers?</summary>
+          <p>Yes. You can switch providers at any time from Settings. Your conversation
+          history is preserved. Each provider has its own set of models — pick the one
+          that works best for your task.</p>
+        </details>
+        <details class="faq-item">
+          <summary>How do I get an API key?</summary>
+          <p>The setup wizard includes direct links to each provider's API key page.
+          Gemini offers a free tier at aistudio.google.com/apikey. Groq offers a free
+          tier at console.groq.com/keys. For fully local AI, install Ollama from
+          ollama.com — no API key needed.</p>
+        </details>
+        <details class="faq-item">
+          <summary>How do I contribute?</summary>
+          <p>JARVIS is open source and contributions are welcome. Read
+          <a href="https://github.com/hakizajr3-glitch/J.R.R.V.I.S/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a>
+          for setup instructions, code style, and PR guidelines. Run
+          <code>./scripts/doctor.sh</code> to verify your development environment.</p>
+        </details>
+        <details class="faq-item">
+          <summary>What license is JARVIS under?</summary>
+          <p>JARVIS is licensed under the MIT License. You can use, modify, and distribute
+          it freely. See <a href="https://github.com/hakizajr3-glitch/J.R.R.V.I.S/blob/main/LICENSE">LICENSE</a>
+          for details.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── CTA ────────────────────────────────────────────────────── -->
+  <section class="cta">
+    <div class="section-inner">
+      <h2>Ready to meet your JARVIS?</h2>
+      <p>Download for macOS — free and open source.</p>
+      <div class="hero-buttons">
+        <a href="https://github.com/hakizajr3-glitch/J.R.R.V.I.S/releases" target="_blank" class="btn btn-primary">
+          Download for macOS
+        </a>
+        <a href="https://github.com/hakizajr3-glitch/J.R.R.V.I.S" target="_blank" class="btn btn-secondary">
+          Star on GitHub
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Footer ─────────────────────────────────────────────────── -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="https://github.com/hakizajr3-glitch/J.R.R.V.I.S">GitHub</a>
+        <a href="https://github.com/hakizajr3-glitch/J.R.R.V.I.S/releases">Releases</a>
+        <a href="https://github.com/hakizajr3-glitch/J.R.R.V.I.S/blob/main/CONTRIBUTING.md">Contributing</a>
+        <a href="https://github.com/hakizajr3-glitch/J.R.R.V.I.S/blob/main/SECURITY.md">Security</a>
+        <a href="https://github.com/hakizajr3-glitch/J.R.R.V.I.S/blob/main/LICENSE">License</a>
+        <a href="#faq">FAQ</a>
+      </div>
+      <p class="footer-copy">© 2025 JARVIS Contributors · MIT License · Built with Tauri + React</p>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,60 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "JARVIS",
+  "version": "1.0.0",
+  "identifier": "com.jarvis.desktop",
+  "build": {
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:5176",
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "JARVIS",
+        "x": 100,
+        "y": 100,
+        "width": 1400,
+        "height": 900,
+        "minWidth": 1024,
+        "minHeight": 700,
+        "resizable": true,
+        "fullscreen": false,
+        "devtools": true
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self' ws://127.0.0.1:* ws://localhost:* wss://*.deepgram.com wss://*.elevenlabs.io wss://*.groq.com wss://*.openai.com; connect-src 'self' http://127.0.0.1:* http://localhost:* https://*.deepgram.com https://*.elevenlabs.io https://*.groq.com https://*.openai.com https://generativelanguage.googleapis.com https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; media-src 'self' blob: mediatracks:; script-src 'self' 'unsafe-inline'; img-src 'self' data: blob:;"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "resources": {
+      "icons/icon-monochrome.png": "icons/icon-monochrome.png",
+      "icons/icon-template.png": "icons/icon-template.png",
+      "icons/icon-template@2x.png": "icons/icon-template@2x.png"
+    },
+    "macOS": {
+      "minimumSystemVersion": "12.0",
+      "entitlements": "entitlements.mac.plist",
+      "infoPlist": "Info.plist"
+    }
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDkzMEU1NTQzMTA3MkVCRjkKUldUNTYzSVFRMVVPazcvK0hlYXgreVBJZ1FlWjNIQ0JBeFg5alAxU3Bxd3FrekN0MlBoc0pvQ2oK",
+      "endpoints": [
+        "https://github.com/hakizajr3-glitch/J.R.R.V.I.S/releases/latest/download/latest.json"
+      ]
+    }
+  }
+}

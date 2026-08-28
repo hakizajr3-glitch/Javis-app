@@ -1,0 +1,21 @@
+J.A.R.V.I.S. SOFTWARE LICENSE AGREEMENT
+
+Copyright (c) 2026 JARVIS Project. All rights reserved.
+
+By downloading, installing, or using this software ("J.A.R.V.I.S." or "JARVIS"), you agree to the following terms:
+
+1. GRANT OF LICENSE. This software is provided free of charge for personal and non-commercial use. You may install and use JARVIS on any number of computers that you personally own or control.
+
+2. RESTRICTIONS. You may not sell, rent, lease, or sublicense JARVIS. You may not reverse engineer, decompile, or disassemble the software except as expressly permitted by applicable law.
+
+3. THIRD-PARTY SERVICES. JARVIS connects to third-party AI services (including but not limited to Google Gemini, ElevenLabs, and LiveKit). Your use of these services is governed by their respective terms of service and privacy policies. JARVIS is not affiliated with or endorsed by these providers.
+
+4. API KEYS. You are responsible for obtaining and managing your own API keys for connected services. JARVIS stores API keys locally on your device and does not transmit them to any server other than the intended service endpoint.
+
+5. DISCLAIMER OF WARRANTY. THIS SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED. THE AUTHORS DISCLAIM ALL WARRANTIES, INCLUDING BUT NOT LIMITED TO MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
+
+6. LIMITATION OF LIABILITY. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY ARISING FROM THE USE OF THIS SOFTWARE.
+
+7. PRIVACY. Camera and microphone access is used solely for real-time AI interaction. No audio or video data is stored or transmitted except to the AI service you have configured with your own API key.
+
+By clicking "Agree" or installing JARVIS, you acknowledge that you have read and understood this agreement.

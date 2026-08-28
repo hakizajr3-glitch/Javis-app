@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "types": ["node"],
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "baseUrl": ".",
+    "paths": {
+      "@jarvis-core/*": ["../jarvis-core/src/*"]
+    },
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "noEmitOnError": false,
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true
+  },
+  "include": ["src/components", "src/global.d.ts", "src/App.tsx", "src/main.tsx", "src/index.css"],
+  "references": [{ "path": "./tsconfig.node.json" }]
+}

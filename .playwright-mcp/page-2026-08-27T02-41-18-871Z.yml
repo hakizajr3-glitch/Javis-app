@@ -1,0 +1,125 @@
+- generic [ref=f11e3]:
+  - banner [ref=f11e4]:
+    - generic [ref=f11e12]:
+      - heading "J.R.R.V.I.S" [level=1] [ref=f11e13]
+      - text: Just A Rather Very Intelligent System
+    - navigation [ref=f11e14]:
+      - button "Intelligence" [ref=f11e15] [cursor=pointer]
+      - button "Notes" [ref=f11e22] [cursor=pointer]
+      - button "Tasks" [ref=f11e28] [cursor=pointer]
+      - button "Contacts" [ref=f11e34] [cursor=pointer]
+      - button "AI Workforce" [ref=f11e43] [cursor=pointer]
+      - button "Organization" [ref=f11e49] [cursor=pointer]
+      - button "Dashboard" [ref=f11e56] [cursor=pointer]
+      - button "Integrations" [ref=f11e64] [cursor=pointer]
+      - button "Control UI" [ref=f11e69] [cursor=pointer]
+    - generic [ref=f11e74]:
+      - generic [ref=f11e75]: Online
+      - button "Command palette (Ctrl+K)" [ref=f11e77] [cursor=pointer]
+      - button [ref=f11e81] [cursor=pointer]
+  - main [ref=f11e85]:
+    - generic [ref=f11e86]:
+      - generic [ref=f11e87]:
+        - generic [ref=f11e88]:
+          - generic: camera offline
+          - button "Turn on camera" [ref=f11e89] [cursor=pointer]
+        - generic [ref=f11e94]:
+          - generic [ref=f11e95]:
+            - generic [ref=f11e96]: "mediaDevices:"
+            - generic [ref=f11e97]: "yes"
+          - generic [ref=f11e98]:
+            - generic [ref=f11e99]: "getUserMedia:"
+            - generic [ref=f11e100]: "yes"
+          - generic [ref=f11e101]:
+            - generic [ref=f11e102]: "secureContext:"
+            - generic [ref=f11e103]: "yes"
+      - generic [ref=f11e108]:
+        - generic [ref=f11e109]:
+          - heading "Today Headlines" [level=3] [ref=f11e110]
+          - button [ref=f11e112] [cursor=pointer]
+        - generic [ref=f11e118]:
+          - paragraph [ref=f11e120]: AI breakthrough in quantum computing announced
+          - paragraph [ref=f11e122]: Global markets respond to new economic policies
+          - paragraph [ref=f11e124]: SpaceX launches next-gen satellite constellation
+          - paragraph [ref=f11e126]: New renewable energy milestone reached
+    - generic [ref=f11e137]:
+      - generic [ref=f11e138]:
+        - generic [ref=f11e140]:
+          - button "IMPORT" [ref=f11e141] [cursor=pointer]
+          - button [ref=f11e145] [cursor=pointer]:
+            - generic [ref=f11e148]: STONIC_DSKTP
+          - button [ref=f11e150] [cursor=pointer]:
+            - generic [ref=f11e153]: MY AIDOCS
+        - generic [ref=f11e155]:
+          - button "ADD FILES MULTIMODAL INPUT" [ref=f11e156] [cursor=pointer]:
+            - generic [ref=f11e160]:
+              - generic [ref=f11e161]: ADD FILES
+              - generic [ref=f11e162]: MULTIMODAL INPUT
+          - button "MEMORY SYSTEM ACCESS" [ref=f11e163] [cursor=pointer]:
+            - generic [ref=f11e173]:
+              - generic [ref=f11e174]: MEMORY
+              - generic [ref=f11e175]: SYSTEM ACCESS
+          - button "HISTORY SYSTEM ACCESS" [ref=f11e176] [cursor=pointer]:
+            - generic [ref=f11e181]:
+              - generic [ref=f11e182]: HISTORY
+              - generic [ref=f11e183]: SYSTEM ACCESS
+          - button "USER SYSTEM ACCESS" [ref=f11e184] [cursor=pointer]:
+            - generic [ref=f11e189]:
+              - generic [ref=f11e190]: USER
+              - generic [ref=f11e191]: SYSTEM ACCESS
+          - button "SETTINGS CONFIGURATION" [ref=f11e192] [cursor=pointer]:
+            - generic [ref=f11e197]:
+              - generic [ref=f11e198]: SETTINGS
+              - generic [ref=f11e199]: CONFIGURATION
+          - button "HARNESS 12-PILLAR CONTROL" [ref=f11e200] [cursor=pointer]:
+            - generic [ref=f11e205]:
+              - generic [ref=f11e206]: HARNESS
+              - generic [ref=f11e207]: 12-PILLAR CONTROL
+        - generic [ref=f11e209]:
+          - generic [ref=f11e210]: STANDBY MODE
+          - button "INITIALIZE AI" [ref=f11e213] [cursor=pointer]
+      - generic [ref=f11e217]:
+        - generic [ref=f11e218]:
+          - generic [ref=f11e219]:
+            - generic [ref=f11e220]: VISUAL HUB
+            - generic [ref=f11e221]: READY
+          - button [ref=f11e222] [cursor=pointer]
+        - generic [ref=f11e227]:
+          - heading "VISUAL INTELLIGENCE HUB" [level=3] [ref=f11e238]
+          - paragraph [ref=f11e239]: Images, Flowcharts, Mindmaps materialize here.
+          - generic [ref=f11e240]:
+            - generic [ref=f11e242]: System Ready
+            - generic [ref=f11e243]: "|"
+            - generic [ref=f11e244]: Awaiting Data Input
+    - generic [ref=f11e245]:
+      - generic [ref=f11e246]:
+        - generic [ref=f11e247]: SYSTEM_TRANSCRIPTION
+        - generic [ref=f11e253]:
+          - button "+ CHAT" [ref=f11e254] [cursor=pointer]:
+            - generic [ref=f11e255]: +
+            - text: CHAT
+          - button "LOGS" [ref=f11e256] [cursor=pointer]
+      - generic [ref=f11e257]:
+        - generic [ref=f11e258]:
+          - generic [ref=f11e259]:
+            - generic [ref=f11e260]: Deep Reasoning
+            - button [ref=f11e264] [cursor=pointer]
+          - generic [ref=f11e266]:
+            - generic [ref=f11e267]: Fast Response Mode
+            - button [ref=f11e268] [cursor=pointer]
+        - generic [ref=f11e270]: No messages yet
+        - generic [ref=f11e272]:
+          - generic [ref=f11e273]:
+            - button "Control UI" [ref=f11e274] [cursor=pointer]
+            - button "Run agent" [ref=f11e277] [cursor=pointer]
+            - button "Tasks" [ref=f11e281] [cursor=pointer]
+          - generic [ref=f11e285]:
+            - generic [ref=f11e286]:
+              - textbox "Type your message..." [ref=f11e287]
+              - button [ref=f11e288] [cursor=pointer]
+            - button [disabled] [ref=f11e292]
+      - generic [ref=f11e296]:
+        - generic [ref=f11e297]:
+          - generic [ref=f11e298]: SYSTEM_OFFLINE
+          - generic [ref=f11e301]: V2.0.1-BETA
+        - generic [ref=f11e302]: System ready - Click INITIALIZE AI to start

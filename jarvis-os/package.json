@@ -1,0 +1,33 @@
+{
+  "name": "jarvis-os",
+  "version": "1.0.0",
+  "description": "J.A.R.V.I.S. Autonomous Desktop Agent System - Your computer runs itself",
+  "private": true,
+  "workspaces": [
+    "apps/desktop",
+    "apps/engine"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:engine\" \"npm run dev:desktop\"",
+    "dev:desktop": "cd apps/desktop && npm run dev",
+    "dev:engine": "cd apps/engine && python3 -m uvicorn main:app --reload --port 8000",
+    "build": "cd apps/desktop && npm run build",
+    "setup": "npm install && cd apps/desktop && npm install",
+    "setup:engine": "cd apps/engine && pip3 install -r requirements.txt",
+    "start": "cd apps/desktop && npm start",
+    "postinstall": "cd apps/desktop && npm install"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  },
+  "keywords": [
+    "ai",
+    "autonomous",
+    "agent",
+    "desktop",
+    "automation",
+    "jarvis"
+  ],
+  "author": "J.A.R.V.I.S. OS Team",
+  "license": "MIT"
+}

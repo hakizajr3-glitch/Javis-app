@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="claw" data-mode="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>J.A.R.V.I.S. Enhanced Tauri UI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #05070a;
+      --bg-elevated: #0b0d12;
+      --bg-card: rgba(13, 16, 23, 0.72);
+      --border: rgba(255,255,255,0.08);
+      --border-strong: rgba(255,255,255,0.14);
+      --text: #f0f2f5;
+      --text-muted: #8b95a7;
+      --text-dim: #5d6778;
+      --primary: #22d3ee;
+      --primary-glow: rgba(34, 211, 238, 0.35);
+      --accent: #00f5d4;
+      --warning: #f59e0b;
+      --error: #ef4444;
+      --success: #34d399;
+      --radius: 12px;
+      --font-sans: 'Inter', system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      overflow: hidden;
+    }
+    .app {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    /* Top bar */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 52px;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(13,16,23,0.95), rgba(13,16,23,0.75));
+      backdrop-filter: blur(12px);
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .orb {
+      width: 26px; height: 26px; border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, var(--primary), transparent 70%),
+                  radial-gradient(circle at 70% 70%, rgba(255,255,255,0.25), transparent 50%);
+      box-shadow: 0 0 14px var(--primary-glow);
+      animation: pulse 3s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.08)} }
+    .brand-title { font-weight: 700; font-size: 14px; letter-spacing: 0.05em; }
+    .brand-sub { font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.12em; }
+    .top-center {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 6px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+    }
+    .chip {
+      display: flex; align-items: center; gap: 6px;
+      padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 500;
+      background: rgba(255,255,255,0.04); color: var(--text-muted); border: 1px solid transparent;
+      transition: all .15s ease;
+    }
+    .chip.active { background: rgba(34,211,238,0.1); color: var(--primary); border-color: rgba(34,211,238,0.25); }
+    .chip svg { width: 12px; height: 12px; }
+    .top-right { display: flex; align-items: center; gap: 10px; }
+    .status-pill {
+      display: flex; align-items: center; gap: 6px;
+      padding: 5px 10px; border-radius: 999px; font-size: 11px; font-weight: 500;
+      background: rgba(52,211,153,0.10); color: var(--success); border: 1px solid rgba(52,211,153,0.25);
+    }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; box-shadow: 0 0 8px currentColor; }
+    .icon-btn {
+      width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--border);
+      background: rgba(255,255,255,0.03); color: var(--text-muted); display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all .15s ease;
+    }
+    .icon-btn:hover { background: rgba(255,255,255,0.07); color: var(--text); border-color: var(--border-strong); }
+    .icon-btn.primary { background: rgba(34,211,238,0.12); color: var(--primary); border-color: rgba(34,211,238,0.25); }
+    .icon-btn.primary:hover { box-shadow: 0 0 12px var(--primary-glow); }
+
+    /* Main layout */
+    .main {
+      flex: 1;
+      display: flex;
+      min-height: 0;
+      padding: 12px;
+      gap: 12px;
+    }
+    /* Left nav rail */
+    .rail {
+      width: 56px;
+      display: flex; flex-direction: column; gap: 6px;
+      padding: 8px 6px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+    .rail-item {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      padding: 8px 4px; border-radius: 10px; color: var(--text-muted); cursor: pointer;
+      font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em;
+      transition: all .15s ease; border: 1px solid transparent;
+    }
+    .rail-item:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+    .rail-item.active { background: rgba(34,211,238,0.10); color: var(--primary); border-color: rgba(34,211,238,0.20); }
+    .rail-item svg { width: 18px; height: 18px; }
+
+    /* Center stage */
+    .stage {
+      flex: 1;
+      display: flex; flex-direction: column; gap: 12px; min-width: 0;
+    }
+    .stage-card {
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+      flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative;
+    }
+    .stage-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 14px; border-bottom: 1px solid var(--border);
+    }
+    .stage-title { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; }
+    .stage-body {
+      flex: 1; display: flex; align-items: center; justify-content: center; position: relative;
+      background: radial-gradient(circle at 50% 40%, rgba(34,211,238,0.06), transparent 55%);
+    }
+    .core-hub {
+      display: flex; flex-direction: column; align-items: center; gap: 18px;
+    }
+    .core-orb {
+      width: 120px; height: 120px; border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, rgba(34,211,238,0.8), rgba(0,245,212,0.2) 45%, transparent 70%);
+      box-shadow: 0 0 60px rgba(34,211,238,0.25), inset 0 0 30px rgba(255,255,255,0.08);
+      animation: breathe 4s ease-in-out infinite;
+      position: relative;
+    }
+    .core-orb::after {
+      content: ''; position: absolute; inset: 8px; border-radius: 50%;
+      border: 1px solid rgba(34,211,238,0.3); animation: spin 12s linear infinite;
+    }
+    @keyframes breathe { 0%,100%{transform:scale(1); opacity:.9} 50%{transform:scale(1.05); opacity:1} }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .core-status { font-size: 13px; color: var(--text-muted); letter-spacing: 0.02em; }
+    .core-status strong { color: var(--primary); font-weight: 600; }
+    .mic-btn {
+      width: 56px; height: 56px; border-radius: 50%; border: 1px solid rgba(34,211,238,0.35);
+      background: rgba(34,211,238,0.10); color: var(--primary); display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all .2s ease; box-shadow: 0 0 20px rgba(34,211,238,0.12);
+    }
+    .mic-btn:hover { transform: scale(1.05); box-shadow: 0 0 30px rgba(34,211,238,0.25); }
+    .mic-btn svg { width: 24px; height: 24px; }
+    .quick-actions {
+      display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
+    }
+    .qa {
+      padding: 6px 12px; border-radius: 999px; font-size: 11px; font-weight: 500;
+      background: rgba(255,255,255,0.04); color: var(--text-muted); border: 1px solid var(--border); cursor: pointer;
+    }
+    .qa:hover { background: rgba(255,255,255,0.08); color: var(--text); }
+
+    /* Bottom row */
+    .row {
+      display: flex; gap: 12px; height: 180px;
+    }
+    .row-card {
+      flex: 1; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 12px; display: flex; flex-direction: column; gap: 8px; min-width: 0;
+    }
+    .row-title { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; display: flex; justify-content: space-between; }
+    .log-line { font-size: 10px; font-family: var(--font-mono); color: var(--text-dim); display: flex; gap: 10px; }
+    .log-time { color: var(--text-muted); }
+    .log-tag { color: var(--primary); }
+
+    /* Right chat panel */
+    .chat {
+      width: 340px; display: flex; flex-direction: column; gap: 12px; min-width: 340px; max-width: 340px;
+    }
+    .chat-card {
+      flex: 1; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+      display: flex; flex-direction: column; overflow: hidden;
+    }
+    .chat-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 12px; border-bottom: 1px solid var(--border);
+    }
+    .chat-header-title { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; }
+    .chat-messages { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 12px; }
+    .message { display: flex; flex-direction: column; gap: 4px; max-width: 92%; }
+    .message.user { align-self: flex-end; align-items: flex-end; }
+    .message.assistant { align-self: flex-start; }
+    .message-meta { font-size: 9px; color: var(--text-dim); font-family: var(--font-mono); text-transform: uppercase; }
+    .bubble {
+      padding: 10px 12px; border-radius: 12px; font-size: 12px; line-height: 1.5;
+      border: 1px solid var(--border);
+    }
+    .message.user .bubble { background: rgba(34,211,238,0.10); color: var(--text); border-color: rgba(34,211,238,0.20); border-bottom-right-radius: 4px; }
+    .message.assistant .bubble { background: rgba(255,255,255,0.04); color: var(--text); border-bottom-left-radius: 4px; }
+    .tool-card {
+      margin-top: 8px; padding: 8px 10px; border-radius: 8px; background: rgba(255,255,255,0.03); border: 1px dashed var(--border);
+      font-size: 10px; color: var(--text-muted); font-family: var(--font-mono);
+    }
+    .tool-card strong { color: var(--accent); }
+    .composer {
+      display: flex; gap: 8px; padding: 10px; border-top: 1px solid var(--border); background: rgba(0,0,0,0.2);
+    }
+    .composer input {
+      flex: 1; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 8px;
+      padding: 8px 10px; font-size: 12px; color: var(--text); outline: none;
+    }
+    .composer input:focus { border-color: var(--primary); }
+    .composer input::placeholder { color: var(--text-dim); }
+    .send-btn {
+      width: 34px; height: 34px; border-radius: 8px; border: 1px solid rgba(34,211,238,0.3);
+      background: rgba(34,211,238,0.12); color: var(--primary); display: flex; align-items: center; justify-content: center; cursor: pointer;
+    }
+    .send-btn:hover { box-shadow: 0 0 12px var(--primary-glow); }
+    .context-card {
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 12px;
+    }
+    .context-title { font-size: 10px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; }
+    .metric-row { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-bottom: 5px; }
+    .metric-row span:last-child { color: var(--text); font-weight: 600; }
+
+    /* Control UI launcher */
+    .control-launcher {
+      position: fixed; bottom: 18px; right: 18px;
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px; border-radius: 999px;
+      background: rgba(13,16,23,0.9); border: 1px solid var(--primary);
+      color: var(--primary); font-size: 12px; font-weight: 600; cursor: pointer;
+      box-shadow: 0 0 24px var(--primary-glow); backdrop-filter: blur(8px);
+    }
+    .control-launcher:hover { background: rgba(34,211,238,0.12); }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="orb"></div>
+        <div>
+          <div class="brand-title">J.A.R.V.I.S.</div>
+          <div class="brand-sub">Just A Rather Very Intelligent System</div>
+        </div>
+      </div>
+      <div class="top-center">
+        <div class="chip active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>Fast</div>
+        <div class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 0 1 0 20 10 10 0 0 1 0-20Zm0 4v8h6"/></svg>Deep</div>
+        <div class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="12" height="16" rx="2"/><path d="M12 16v.01"/></svg>Gemini 1.5 Flash</div>
+      </div>
+      <div class="top-right">
+        <div class="status-pill"><span class="dot"></span>Online</div>
+        <button class="icon-btn">⚙</button>
+        <button class="icon-btn primary">?</button>
+      </div>
+    </header>
+
+    <main class="main">
+      <nav class="rail">
+        <div class="rail-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>Intelligence</div>
+        <div class="rail-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>Notes</div>
+        <div class="rail-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Tasks</div>
+        <div class="rail-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Contacts</div>
+        <div class="rail-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9z"/><path d="M15 15v3M15 6v3M9 15v3M9 6v3M6 9h3M6 15h3M15 9h3M15 15h3"/></svg>Workforce</div>
+        <div class="rail-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 9l-5-5-6 6-3 3"/></svg>Dashboard</div>
+        <div class="rail-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>Integrations</div>
+      </nav>
+
+      <section class="stage">
+        <div class="stage-card">
+          <div class="stage-header">
+            <div class="stage-title"><span style="color:var(--primary)">●</span> Intelligence Hub</div>
+            <div style="font-size:11px;color:var(--text-dim)">STANDBY MODE</div>
+          </div>
+          <div class="stage-body">
+            <div class="core-hub">
+              <div class="core-orb"></div>
+              <div class="core-status">Say <strong>"Hey JARVIS"</strong> or tap the microphone</div>
+              <button class="mic-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v4M8 23h8"/></svg></button>
+              <div class="quick-actions">
+                <div class="qa">Open Control UI</div>
+                <div class="qa">Run agent</div>
+                <div class="qa">Check tasks</div>
+                <div class="qa">Send message</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="row-card">
+            <div class="row-title">System Log <span style="color:var(--primary)">● live</span></div>
+            <div class="log-line"><span class="log-time">10:42:01</span><span class="log-tag">BOOT</span>Core platform initialized</div>
+            <div class="log-line"><span class="log-time">10:42:03</span><span class="log-tag">WS</span>Voice gateway connected</div>
+            <div class="log-line"><span class="log-time">10:42:05</span><span class="log-tag">AI</span>Reasoning model loaded</div>
+          </div>
+          <div class="row-card">
+            <div class="row-title">Active Agents</div>
+            <div class="log-line"><span class="log-time">●</span>Commander — idle</div>
+            <div class="log-line"><span class="log-time">●</span>Planner — idle</div>
+            <div class="log-line"><span class="log-time">●</span>Observer — monitoring</div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="chat">
+        <div class="chat-card">
+          <div class="chat-header">
+            <div class="chat-header-title"><span style="color:var(--primary)">▮</span> Conversation</div>
+            <div style="font-size:10px;color:var(--text-dim)">12 messages</div>
+          </div>
+          <div class="chat-messages">
+            <div class="message assistant">
+              <div class="message-meta">JARVIS · 10:41</div>
+              <div class="bubble">Good morning. I am online and ready. What would you like to work on?</div>
+            </div>
+            <div class="message user">
+              <div class="message-meta">You · 10:42</div>
+              <div class="bubble">Open the Control UI and start a deployment agent.</div>
+              <div class="tool-card"><strong>tool:</strong> open_control_ui<br/><strong>tool:</strong> spawn_agent deployment</div>
+            </div>
+            <div class="message assistant">
+              <div class="message-meta">JARVIS · 10:42</div>
+              <div class="bubble">Opening Control UI and spawning a deployment agent now.</div>
+              <div class="tool-card"><strong>status:</strong> Control UI launched<br/><strong>agent:</strong> deployment-runner · running</div>
+            </div>
+          </div>
+          <div class="composer">
+            <input type="text" placeholder="Type a command or ask JARVIS..." />
+            <button class="send-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg></button>
+          </div>
+        </div>
+        <div class="context-card">
+          <div class="context-title">Context</div>
+          <div class="metric-row"><span>Tokens</span><span>12.4k</span></div>
+          <div class="metric-row"><span>Latency</span><span>142ms</span></div>
+          <div class="metric-row"><span>Context window</span><span>42%</span></div>
+        </div>
+      </aside>
+    </main>
+
+    <div class="control-launcher">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
+      Open Control UI
+    </div>
+  </div>
+</body>
+</html>

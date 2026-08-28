@@ -1,0 +1,43 @@
+{
+  "name": "jarvis-tauri",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "tauri": "tauri",
+    "sign:mac": "codesign --sign - --force --deep --options runtime --entitlements src-tauri/entitlements.mac.plist --preserve-metadata=identifier,entitlements,flags src-tauri/target/release/bundle/macos/jarvis-desktop.app",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@livekit/components-react": "^2.9.20",
+    "@tauri-apps/api": "^2.11.1",
+    "@tauri-apps/plugin-process": "^2.3.1",
+    "@tauri-apps/plugin-shell": "^2.3.5",
+    "@tauri-apps/plugin-updater": "^2.10.1",
+    "livekit-client": "^2.18.4",
+    "livekit-server-sdk": "^2.15.1",
+    "lucide-react": "^1.8.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.11.1",
+    "@types/node": "^25.6.0",
+    "@types/react": "^18.3.28",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^4.2.0",
+    "autoprefixer": "^10.5.0",
+    "esbuild": "^0.28.0",
+    "postcss": "^8.5.10",
+    "tailwindcss": "^3.4.19",
+    "typescript": "^5.0.0",
+    "vite": "^5.4.0"
+  }
+}

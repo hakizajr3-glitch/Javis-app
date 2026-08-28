@@ -1,0 +1,11 @@
+packages:
+  - "packages/*"
+  - "jarvis-tauri"
+  - "jarvis-new"
+  - "jarvis-os/apps/desktop"
+
+allowBuilds:
+  electron: true
+  esbuild: true
+  bcrypt: true
+  better-sqlite3: true

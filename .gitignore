@@ -1,0 +1,87 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build artifacts
+dist/
+**/dist/
+dist-artifacts/
+build/
+**/build/
+release/
+**/release/
+
+# Rust / Tauri build targets
+target/
+**/target/
+src-tauri/target/
+**/src-tauri/target/
+
+# Tauri generated
+src-tauri/gen/
+
+# Electron builds (too large for git)
+jarvis-electron/release/
+jarvis-electroni/release/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Environment & secrets
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Test coverage
+coverage/
+**/coverage/
+.nyc_output/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Lock files for other package managers (keep pnpm-lock.yaml)
+package-lock.json
+yarn.lock
+
+# Compiled skills
+skills-lock.json
+
+# Reports (generated)
+reports/
+
+# Database files
+*.db
+*.db-wal
+*.db-shm
+.freebuff/
+
+# Large screenshots / icons (not needed in git)
+*.png
+*.icns
+*.ico
+!jarvis-tauri/src-tauri/icons/icon.png
+!jarvis-tauri/src-tauri/icons/32x32.png
+!jarvis-tauri/src-tauri/icons/128x128.png
+!jarvis-tauri/src-tauri/icons/128x128@2x.png
+!docs/**/*.png

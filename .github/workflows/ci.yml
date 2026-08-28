@@ -1,0 +1,79 @@
+name: CI
+
+# Runs on every push and PR to make sure the app builds and tests pass.
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  # ─── Test jarvis-core ──────────────────────────────────────────────────────
+  test-core:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install pnpm
+        run: npm install -g pnpm@latest
+
+      - name: Install dependencies
+        run: cd jarvis-core && pnpm install --frozen-lockfile
+
+      - name: Run tests
+        run: cd jarvis-core && npx vitest run
+
+  # ─── Build jarvis-tauri frontend (verify it compiles) ──────────────────────
+  build-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install pnpm
+        run: npm install -g pnpm@latest
+
+      - name: Install jarvis-core dependencies
+        run: cd jarvis-core && pnpm install --frozen-lockfile
+
+      - name: Install jarvis-tauri dependencies
+        run: cd jarvis-tauri && pnpm install --frozen-lockfile
+
+      - name: Build frontend
+        run: cd jarvis-tauri && npx vite build
+
+  # ─── Build macOS app (verify Tauri builds) ─────────────────────────────────
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install pnpm
+        run: npm install -g pnpm@latest
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install jarvis-core dependencies
+        run: cd jarvis-core && pnpm install --frozen-lockfile
+
+      - name: Install jarvis-tauri dependencies
+        run: cd jarvis-tauri && pnpm install --frozen-lockfile
+
+      - name: Build Tauri app
+        run: cd jarvis-tauri && pnpm tauri build --target aarch64-apple-darwin

@@ -1,0 +1,157 @@
+- generic [ref=f11e3]:
+  - banner [ref=f11e4]:
+    - generic [ref=f11e12]:
+      - heading "J.R.R.V.I.S" [level=1] [ref=f11e13]
+      - text: Just A Rather Very Intelligent System
+    - navigation [ref=f11e14]:
+      - button "Intelligence" [ref=f11e15] [cursor=pointer]
+      - button "Notes" [ref=f11e22] [cursor=pointer]
+      - button "Tasks" [ref=f11e28] [cursor=pointer]
+      - button "Contacts" [ref=f11e34] [cursor=pointer]
+      - button "AI Workforce" [ref=f11e43] [cursor=pointer]
+      - button "Organization" [ref=f11e49] [cursor=pointer]
+      - button "Dashboard" [ref=f11e56] [cursor=pointer]
+      - button "Integrations" [ref=f11e64] [cursor=pointer]
+      - button "Control UI" [ref=f11e69] [cursor=pointer]
+    - generic [ref=f11e74]:
+      - generic [ref=f11e75]: Online
+      - button "Command palette (Ctrl+K)" [ref=f11e77] [cursor=pointer]
+      - button [ref=f11e81] [cursor=pointer]
+  - main [ref=f11e85]:
+    - generic [ref=f11e86]:
+      - generic [ref=f11e87]:
+        - generic [ref=f11e88]:
+          - generic: camera offline
+          - button "Turn on camera" [ref=f11e89] [cursor=pointer]
+        - generic [ref=f11e94]:
+          - generic [ref=f11e95]:
+            - generic [ref=f11e96]: "mediaDevices:"
+            - generic [ref=f11e97]: "yes"
+          - generic [ref=f11e98]:
+            - generic [ref=f11e99]: "getUserMedia:"
+            - generic [ref=f11e100]: "yes"
+          - generic [ref=f11e101]:
+            - generic [ref=f11e102]: "secureContext:"
+            - generic [ref=f11e103]: "yes"
+      - generic [ref=f11e108]:
+        - generic [ref=f11e109]:
+          - heading "Today Headlines" [level=3] [ref=f11e110]
+          - button [ref=f11e112] [cursor=pointer]
+        - generic [ref=f11e118]:
+          - paragraph [ref=f11e120]: AI breakthrough in quantum computing announced
+          - paragraph [ref=f11e122]: Global markets respond to new economic policies
+          - paragraph [ref=f11e124]: SpaceX launches next-gen satellite constellation
+          - paragraph [ref=f11e126]: New renewable energy milestone reached
+    - generic [ref=f11e307]:
+      - generic [ref=f11e308]:
+        - button "Chat" [ref=f11e309] [cursor=pointer]
+        - button "Harness Control" [ref=f11e312] [cursor=pointer]
+      - generic [ref=f11e316]:
+        - complementary [ref=f11e317]:
+          - generic [ref=f11e318]: Control UI
+          - generic [ref=f11e322]:
+            - generic [ref=f11e323]: Work / Agents
+            - generic [ref=f11e324]:
+              - button "#deploy-site GPT-4o" [ref=f11e325] [cursor=pointer]:
+                - generic [ref=f11e328]:
+                  - generic [ref=f11e329]: "#deploy-site"
+                  - generic [ref=f11e330]: GPT-4o
+              - button "Research agent Claude 3.7" [ref=f11e331] [cursor=pointer]:
+                - generic [ref=f11e334]:
+                  - generic [ref=f11e335]: Research agent
+                  - generic [ref=f11e336]: Claude 3.7
+              - button "Codex harness Gemini 1.5" [ref=f11e337] [cursor=pointer]:
+                - generic [ref=f11e340]:
+                  - generic [ref=f11e341]: Codex harness
+                  - generic [ref=f11e342]: Gemini 1.5
+          - generic [ref=f11e343]:
+            - generic [ref=f11e344]:
+              - generic [ref=f11e345]: Gateway
+              - generic [ref=f11e346]: ● online
+            - generic [ref=f11e347]:
+              - generic [ref=f11e348]: Agents
+              - generic [ref=f11e349]: 3 active
+        - main [ref=f11e350]:
+          - generic [ref=f11e351]:
+            - generic [ref=f11e352]:
+              - generic [ref=f11e353]: "#deploy-site"
+              - generic [ref=f11e354]: GPT-4o
+            - generic [ref=f11e355]: Context 42%
+          - generic [ref=f11e357]:
+            - generic:
+              - generic [ref=f11e358]: System · now
+              - generic [ref=f11e359]: "Commander parsed goal: deploy marketing site to Vercel and notify Slack"
+            - generic:
+              - generic [ref=f11e360]: JARVIS · now
+              - generic [ref=f11e361]: I'll deploy the marketing site and notify the team. Planner created 4 tasks.
+            - generic:
+              - generic [ref=f11e362]: You · now
+              - generic [ref=f11e363]: Go ahead. Use the production token.
+            - generic:
+              - generic [ref=f11e364]: JARVIS · now
+              - generic [ref=f11e365]: browser_navigate → https://vercel.com/dashboard run_shell → vercel --prod (pending approval)
+          - generic [ref=f11e366]:
+            - generic:
+              - button [ref=f11e367] [cursor=pointer]
+              - button [ref=f11e370] [cursor=pointer]
+              - button [ref=f11e375] [cursor=pointer]
+              - button [ref=f11e379] [cursor=pointer]
+            - generic:
+              - textbox "Type a command or ask JARVIS..." [ref=f11e383]
+              - button [disabled] [ref=f11e384]
+        - complementary [ref=f11e388]:
+          - generic [ref=f11e389]:
+            - button "tasks" [ref=f11e390] [cursor=pointer]
+            - button "agents" [ref=f11e391] [cursor=pointer]
+            - button "audit" [ref=f11e392] [cursor=pointer]
+          - generic [ref=f11e394]:
+            - generic [ref=f11e395]: Current Run
+            - generic [ref=f11e396]:
+              - generic [ref=f11e397]: done
+              - generic [ref=f11e398]: Parse goal & entities
+            - generic [ref=f11e399]:
+              - generic [ref=f11e400]: done
+              - generic [ref=f11e401]: Create task graph
+            - generic [ref=f11e402]:
+              - generic [ref=f11e403]: running
+              - generic [ref=f11e404]: Navigate Vercel dashboard
+            - generic [ref=f11e405]:
+              - generic [ref=f11e406]: blocked
+              - generic [ref=f11e407]: Deploy production build
+            - generic [ref=f11e408]:
+              - generic [ref=f11e409]: idle
+              - generic [ref=f11e410]: "Notify Slack #deploys"
+            - generic [ref=f11e411]: Progress
+            - generic [ref=f11e414]: 2 of 5 tasks complete
+    - generic [ref=f11e245]:
+      - generic [ref=f11e246]:
+        - generic [ref=f11e247]: SYSTEM_TRANSCRIPTION
+        - generic [ref=f11e253]:
+          - button "+ CHAT" [ref=f11e254] [cursor=pointer]:
+            - generic [ref=f11e255]: +
+            - text: CHAT
+          - button "LOGS" [ref=f11e256] [cursor=pointer]
+      - generic [ref=f11e257]:
+        - generic [ref=f11e258]:
+          - generic [ref=f11e259]:
+            - generic [ref=f11e260]: Deep Reasoning
+            - button [ref=f11e264] [cursor=pointer]
+          - generic [ref=f11e266]:
+            - generic [ref=f11e267]: Fast Response Mode
+            - button [ref=f11e268] [cursor=pointer]
+        - generic [ref=f11e270]: No messages yet
+        - generic [ref=f11e272]:
+          - generic [ref=f11e273]:
+            - button "Control UI" [ref=f11e274] [cursor=pointer]
+            - button "Run agent" [ref=f11e277] [cursor=pointer]
+            - button "Tasks" [ref=f11e281] [cursor=pointer]
+          - generic [ref=f11e285]:
+            - generic [ref=f11e286]:
+              - textbox "Type your message..." [ref=f11e287]
+              - button [ref=f11e288] [cursor=pointer]
+            - button [disabled] [ref=f11e292]
+      - generic [ref=f11e296]:
+        - generic [ref=f11e297]:
+          - generic [ref=f11e298]: SYSTEM_OFFLINE
+          - generic [ref=f11e301]: V2.0.1-BETA
+        - generic [ref=f11e302]: System ready - Click INITIALIZE AI to start

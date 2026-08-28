@@ -1,0 +1,228 @@
+name: Release
+
+# Build and publish JARVIS desktop app for macOS.
+#
+# Triggers on:
+#   1. Push of a version tag (v*.*.*) — publishes a GitHub Release with binaries
+#   2. Manual dispatch from the Actions tab
+#
+# Output artifacts:
+#   macOS (Apple Silicon):  JARVIS_*_aarch64.dmg        — for M1/M2/M3/M4 Macs
+#   macOS (Intel):          JARVIS_*_x64.dmg            — for Intel Macs
+#   checksums.txt           — SHA256 hashes for all binaries
+#
+# Users download the .dmg for their Mac, double-click, drag to Applications.
+# No Node.js, Rust, or terminal needed.
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version (e.g. 0.1.0)'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+jobs:
+  # ─── Build for macOS (Apple Silicon + Intel) ───────────────────────────────
+  build-macos:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        target:
+          - aarch64-apple-darwin    # Apple Silicon (M1/M2/M3/M4)
+          - x86_64-apple-darwin     # Intel
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install pnpm
+        run: npm install -g pnpm@latest
+
+      - name: Install Rust (stable)
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Install jarvis-core dependencies
+        run: cd jarvis-core && pnpm install --frozen-lockfile
+
+      - name: Install jarvis-tauri dependencies
+        run: cd jarvis-tauri && pnpm install --frozen-lockfile
+
+      - name: Build Tauri app (${{ matrix.target }})
+        run: cd jarvis-tauri && pnpm tauri build --target ${{ matrix.target }}
+        env:
+          # Code signing is optional — unsigned builds work but show a
+          # "developer not verified" warning on first launch.
+          # Users right-click → Open to bypass.
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+
+      - name: Rename artifacts
+        run: |
+          cd jarvis-tauri/src-tauri/target/${{ matrix.target }}/release/bundle/dmg
+          for f in *.dmg; do
+            if [ -f "$f" ]; then
+              mv "$f" "JARVIS_${{ matrix.target }}.dmg"
+            fi
+          done
+
+      - name: Upload macOS artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: jarvis-macos-${{ matrix.target }}
+          path: |
+            jarvis-tauri/src-tauri/target/${{ matrix.target }}/release/bundle/dmg/*.dmg
+
+  # ─── Publish GitHub Release ────────────────────────────────────────────────
+  publish-release:
+    needs: [build-macos]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Determine version
+        id: version
+        run: |
+          if [ "${{ github.event.inputs.version }}" != "" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+            echo "tag=v${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            TAG="${GITHUB_REF#refs/tags/}"
+            echo "version=${TAG#v}" >> $GITHUB_OUTPUT
+            echo "tag=$TAG" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: List artifacts
+        run: find artifacts -type f | sort
+
+      - name: Generate checksums
+        run: |
+          mkdir -p release
+          cp artifacts/*.dmg release/ 2>/dev/null || true
+          cd release
+          sha256sum *.dmg > ../checksums.txt
+          cd ..
+          echo "=== checksums.txt ==="
+          cat checksums.txt
+
+      - name: Generate latest.json (for Tauri auto-updater)
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          TAG="${{ steps.version.outputs.tag }}"
+          # The Tauri updater reads this JSON to check for new versions
+          # We generate it so the app can auto-update on future releases
+          cat > latest.json << EOF
+          {
+            "version": "${VERSION}",
+            "notes": "JARVIS ${VERSION}",
+            "pub_date": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "platforms": {
+              "darwin-aarch64": {
+                "signature": "",
+                "url": "https://github.com/hakizajr3-glitch/J.R.R.V.I.S/releases/download/${TAG}/JARVIS_aarch64-apple-darwin.dmg"
+              },
+              "darwin-x86_64": {
+                "signature": "",
+                "url": "https://github.com/hakizajr3-glitch/J.R.R.V.I.S/releases/download/${TAG}/JARVIS_x86_64-apple-darwin.dmg"
+              }
+            }
+          }
+          EOF
+          echo "=== latest.json ==="
+          cat latest.json
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          # Generate changelog from commits since last tag
+          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+          if [ -n "$PREV_TAG" ]; then
+            echo "Generating changelog from $PREV_TAG to ${{ steps.version.outputs.tag }}"
+            git log --pretty=format:"- %s (%h)" "$PREV_TAG"..HEAD > changelog.txt
+          else
+            echo "No previous tag found — generating full changelog"
+            git log --pretty=format:"- %s (%h)" -20 > changelog.txt
+          fi
+          echo "=== changelog.txt ==="
+          cat changelog.txt
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: ${{ steps.version.outputs.tag }}
+          body: |
+            ## Download
+
+            **JARVIS is currently available for macOS only.**
+
+            | File | Architecture | Macs |
+            |------|-------------|------|
+            | `JARVIS_aarch64-apple-darwin.dmg` | Apple Silicon | M1, M2, M3, M4 |
+            | `JARVIS_x86_64-apple-darwin.dmg` | Intel | 2020 and older |
+
+            ### Install
+
+            1. Download the `.dmg` for your Mac
+            2. Double-click to open
+            3. Drag **JARVIS** into your **Applications** folder
+            4. Open JARVIS — on first launch, macOS may say "developer not verified"
+               - Right-click JARVIS → **Open** → **Open Anyway**
+            5. The setup wizard appears — pick your AI provider and enter your API key
+
+            ### Supported AI Providers
+
+            | Provider | Free | Get API Key |
+            |----------|------|-------------|
+            | Google Gemini | Yes | https://aistudio.google.com/apikey |
+            | OpenAI | No | https://platform.openai.com/api-keys |
+            | Anthropic Claude | No | https://console.anthropic.com/settings/keys |
+            | OpenRouter | Yes | https://openrouter.ai/keys |
+            | Groq | Yes | https://console.groq.com/keys |
+            | Mistral | Yes | https://console.mistral.ai/api-keys |
+            | DeepSeek | No | https://platform.deepseek.com/api_keys |
+            | Together AI | Yes | https://api.together.xyz/settings/api-keys |
+            | Fireworks AI | Yes | https://fireworks.ai/api-keys |
+            | Ollama (local) | Yes | https://ollama.com (no key needed) |
+            | xAI Grok | No | https://console.x.ai |
+            | Perplexity | No | https://www.perplexity.ai/settings/api |
+
+            Pick any provider, paste your key, click **Connect**. That's it.
+
+            ### Updating
+
+            JARVIS auto-updates — when a new version is released you'll get a
+            notification in the app. Click **Update** and it restarts itself.
+
+            ---
+
+            ## Changelog
+
+            ${{ steps.changelog.outputs.changelog }}
+
+            $(cat changelog.txt)
+          files: |
+            release/*.dmg
+            checksums.txt
+            latest.json
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

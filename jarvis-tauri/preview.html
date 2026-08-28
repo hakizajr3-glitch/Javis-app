@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>J.A.R.V.I.S.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg-root: #080c12;
+      --bg-panel: #0b1119;
+      --bg-card: #0d1520;
+      --bg-hover: #161f2a;
+      --stonic-blue: #00d8ee;
+      --stonic-blue-glow: rgba(0, 216, 238, 0.4);
+      --b1: rgba(0, 216, 238, 0.08);
+      --b2: rgba(0, 216, 238, 0.15);
+      --b3: rgba(0, 216, 238, 0.35);
+      --cyan: #00d8ee;
+      --teal: #00f5d4;
+      --red: #ef4444;
+      --blue: #3b82f6;
+      --slate: #64748b;
+      --text: #e6f7ff;
+      --textDim: #64748b;
+      --textMuted: #475569;
+      --success: #00ff88;
+    }
+
+    body {
+      font-family: 'Rajdhani', system-ui, sans-serif;
+      background-color: var(--bg-root);
+      color: var(--text);
+      overflow-x: auto;
+      overflow-y: hidden;
+      height: 100vh;
+      width: 100vw;
+      position: relative;
+    }
+
+    /* CRT Scanline + Vignette Overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background:
+        radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.4) 100%),
+        repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.15) 2px, rgba(0,0,0,0.15) 4px);
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.6;
+    }
+
+    .font-orbitron { font-family: 'Orbitron', sans-serif; }
+    .font-rajdhani { font-family: 'Rajdhani', sans-serif; }
+    .font-mono-tech { font-family: 'Share Tech Mono', monospace; }
+
+    /* App Layout */
+    .app {
+      display: flex; flex-direction: column; height: 100vh;
+      min-width: 1280px; /* desktop layout — preserve column widths below this */
+    }
+    .left-actions, .connection-area, .right-panel { flex-shrink: 0; }
+    .center-cards { flex: 0 1 auto; min-width: 0; }
+    .sphere-area { min-width: 0; } /* already has flex: 1, override default min-width:auto */
+
+    /* Top Navigation */
+    .top-nav {
+      height: 44px;
+      background: var(--bg-panel);
+      border-bottom: 1px solid var(--b2);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 50;
+    }
+
+    .logo-area { display: flex; align-items: center; gap: 12px; }
+    .logo-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: linear-gradient(135deg, rgba(239,68,68,0.3), rgba(245,158,11,0.2));
+      display: flex; align-items: center; justify-content: center;
+      border: 1px solid rgba(239,68,68,0.4);
+      box-shadow: 0 0 15px rgba(239,68,68,0.3);
+      position: relative;
+      color: var(--red);
+      font-size: 16px;
+    }
+    .logo-dot {
+      position: absolute; bottom: -2px; right: -2px;
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 8px rgba(0,255,136,0.8);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    .logo-title { font-family: 'Orbitron', sans-serif; font-size: 18px; font-weight: 900; letter-spacing: 0.15em; color: white; }
+    .logo-subtitle { font-family: 'Share Tech Mono', monospace; font-size: 9px; color: var(--textDim); text-transform: uppercase; letter-spacing: 0.2em; }
+
+    .nav-tabs { display: flex; gap: 4px; }
+    .nav-tab {
+      position: relative; padding: 8px 16px; border-radius: 8px;
+      display: flex; align-items: center; gap: 8px;
+      font-family: 'Rajdhani', sans-serif; font-weight: 600; font-size: 14px;
+      letter-spacing: 0.05em; cursor: pointer;
+      transition: all 0.3s;
+      color: var(--textMuted);
+      border: 1px solid transparent;
+      background: none;
+    }
+    .nav-tab:hover { color: var(--text); background: rgba(22,31,42,0.5); }
+    .nav-tab.active {
+      color: var(--cyan); background: rgba(0,216,238,0.05);
+      border-color: rgba(0,216,238,0.4);
+      box-shadow: 0 0 15px rgba(0,216,238,0.15);
+    }
+    .nav-tab.active::after {
+      content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+      width: 24px; height: 2px; background: var(--cyan); border-radius: 1px;
+      box-shadow: 0 0 10px rgba(0,216,238,0.8);
+    }
+
+    .settings-btn {
+      padding: 8px; border-radius: 8px; border: none;
+      color: var(--textMuted); cursor: pointer;
+      transition: all 0.3s; background: none;
+    }
+    .settings-btn:hover { color: var(--cyan); background: rgba(22,31,42,0.5); }
+
+    /* Main Content */
+    .main-content {
+      flex: 1; display: flex; gap: 16px; padding: 16px;
+      min-height: 0; overflow: hidden;
+    }
+
+    /* Left Sidebar */
+    .left-sidebar { width: 280px; display: flex; flex-direction: column; gap: 16px; flex-shrink: 0; }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--b1);
+      border-radius: 12px;
+      padding: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before, .card::after {
+      content: ''; position: absolute; width: 8px; height: 8px;
+      border-color: rgba(0,216,238,0.2);
+    }
+    .card::before { top: 0; left: 0; border-top: 1px solid; border-left: 1px solid; border-radius: 8px 0 0 0; }
+    .card::after { bottom: 0; right: 0; border-bottom: 1px solid; border-right: 1px solid; border-radius: 0 0 8px 0; }
+
+    .camera-area {
+      aspect-ratio: 16/9; border-radius: 8px; overflow: hidden;
+      background: rgba(11,17,25,0.5); border: 1px solid var(--b1);
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+    }
+    .camera-area .icon { color: var(--textDim); opacity: 0.3; font-size: 24px; }
+    .camera-area .label { font-family: 'Share Tech Mono', monospace; font-size: 9px; color: var(--textDim); letter-spacing: 0.05em; }
+    .corner-btn {
+      position: absolute; bottom: 8px; right: 8px;
+      padding: 6px; border-radius: 6px; border: 1px solid var(--b1);
+      background: rgba(11,17,25,0.8); cursor: pointer;
+      transition: all 0.3s; color: var(--textDim);
+    }
+    .corner-btn:hover { border-color: rgba(0,216,238,0.4); color: var(--cyan); background: rgba(0,216,238,0.1); }
+
+    .headlines-header {
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;
+    }
+    .headlines-header h3 {
+      font-family: 'Share Tech Mono', monospace; font-size: 11px; font-weight: 700;
+      color: var(--cyan); letter-spacing: 0.05em;
+    }
+    .headline-item { padding: 6px 0; border-bottom: 1px solid var(--b1); }
+    .headline-item:last-child { border-bottom: none; }
+    .headline-item p { font-family: 'Share Tech Mono', monospace; font-size: 9px; color: var(--textDim); }
+
+    /* Left Action Buttons */
+    .left-actions {
+      background: rgba(11,17,25,0.8); backdrop-filter: blur(12px);
+      border: 1px solid rgba(0,216,238,0.08); border-radius: 28px;
+      padding: 20px 12px; display: flex; flex-direction: column; align-items: center; gap: 16px;
+    }
+    .action-btn {
+      width: 56px; height: 56px; border-radius: 16px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+      cursor: pointer; transition: all 0.3s; border: none; background: none;
+    }
+    .action-btn.primary {
+      background: rgba(13,21,32,0.5); border: 1px solid rgba(0,216,238,0.6);
+      box-shadow: 0 0 20px rgba(0,216,238,0.25);
+    }
+    .action-btn.primary:hover { box-shadow: 0 0 25px rgba(0,216,238,0.4); }
+    .action-btn.dim {
+      background: rgba(13,21,32,0.3); border: 1px solid var(--b1); opacity: 0.5;
+    }
+    .action-btn.dim:hover { opacity: 0.7; }
+    .action-btn .label {
+      font-family: 'Share Tech Mono', monospace; font-size: 7px; font-weight: 700;
+      letter-spacing: 0.1em; text-align: center; line-height: 1.1;
+    }
+    .divider { width: 40px; height: 1px; background: rgba(0,216,238,0.2); }
+
+    /* Center Cards */
+    .center-cards { display: flex; flex-direction: column; justify-content: center; gap: 8px; }
+
+    .input-card {
+      padding: 12px 16px; border-radius: 8px; display: flex; align-items: center; gap: 12px;
+      cursor: pointer; transition: all 0.3s;
+      background: rgba(13,21,32,0.8); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    }
+    .input-card.cyan { border: 1px solid rgba(0,216,238,0.3); }
+    .input-card.cyan:hover { border-color: rgba(0,216,238,0.5); }
+    .input-card.red {
+      border: 1px solid rgba(239,68,68,0.4);
+      box-shadow: 0 0 15px rgba(239,68,68,0.15);
+    }
+    .input-card.red:hover { box-shadow: 0 0 20px rgba(239,68,68,0.25); }
+    .input-card.blue { border: 1px solid rgba(59,130,246,0.3); }
+    .input-card.blue:hover { border-color: rgba(59,130,246,0.5); }
+    .input-card.slate { border: 1px solid rgba(100,116,139,0.3); }
+    .input-card.slate:hover { border-color: rgba(100,116,139,0.5); }
+    .input-card.amber { border: 1px solid rgba(245,158,11,0.3); }
+    .input-card.amber:hover { border-color: rgba(245,158,11,0.5); }
+
+    .input-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .input-icon.cyan-bg { background: rgba(0,216,238,0.1); border: 1px solid rgba(0,216,238,0.3); color: var(--cyan); }
+    .input-icon.red-bg { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.4); color: var(--red); }
+    .input-icon.blue-bg { background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.3); color: var(--blue); }
+    .input-icon.slate-bg { background: rgba(100,116,139,0.1); border: 1px solid rgba(100,116,139,0.3); color: #c8d0d8; }
+    .input-icon.amber-bg { background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3); color: #fcd34d; }
+    .input-label { display: flex; flex-direction: column; }
+    .input-label .main { font-family: 'Share Tech Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: 0.1em; }
+    .input-label .sub { font-family: 'Share Tech Mono', monospace; font-size: 7px; letter-spacing: 0.1em; opacity: 0.8; }
+
+    /* Connection Lines Canvas */
+    .connection-area { width: 280px; position: relative; margin-left: -8px; }
+
+    /* Center Sphere Area */
+    .sphere-area {
+      flex: 1; background: var(--bg-card); border: 1px solid var(--b1);
+      border-radius: 12px; display: flex; flex-direction: column;
+      margin-left: -8px; position: relative; overflow: hidden;
+    }
+    .sphere-canvas-wrap { flex: 1; position: relative; display: flex; align-items: center; justify-content: center; }
+    .sphere-status {
+      position: absolute; bottom: 64px; left: 0; right: 0;
+      text-align: center; pointer-events: none;
+    }
+    .sphere-status span {
+      font-family: 'Share Tech Mono', monospace; font-size: 9px;
+      color: var(--textDim); letter-spacing: 0.25em; text-transform: uppercase;
+    }
+    .init-btn-wrap { display: flex; justify-content: center; padding: 12px; }
+    .init-btn {
+      padding: 8px 24px; border-radius: 9999px;
+      font-family: 'Share Tech Mono', monospace; font-size: 10px; font-weight: 600;
+      letter-spacing: 0.1em; cursor: pointer; transition: all 0.5s;
+      display: flex; align-items: center; gap: 8px;
+      border: 1px solid rgba(0,216,238,0.5); color: var(--cyan);
+      background: none;
+    }
+    .init-btn:hover {
+      border-color: var(--cyan); background: rgba(0,216,238,0.1);
+      box-shadow: 0 0 20px rgba(0,216,238,0.3);
+    }
+
+    /* Visual Hub */
+    .visual-hub {
+      background: var(--bg-card); border: 1px solid var(--b1); border-radius: 12px;
+      padding: 12px; position: relative; overflow: hidden;
+      height: 180px; margin-top: 16px;
+    }
+    .hub-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .hub-header .title { font-family: 'Share Tech Mono', monospace; font-size: 8px; font-weight: 700; color: var(--cyan); letter-spacing: 0.1em; }
+    .hub-header .badge { font-family: 'Share Tech Mono', monospace; font-size: 7px; color: var(--textDim); padding: 2px 4px; border-radius: 4px; background: rgba(11,17,25,0.5); }
+    .hub-center {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      height: calc(100% - 32px); margin-top: -4px;
+    }
+    .hub-icon {
+      width: 40px; height: 40px; border-radius: 12px;
+      background: linear-gradient(135deg, var(--bg-panel), var(--bg-hover));
+      border: 1px solid rgba(0,216,238,0.25); display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 15px rgba(0,212,255,0.1); margin-bottom: 8px;
+      position: relative; color: var(--textDim);
+    }
+    .hub-sparkle {
+      position: absolute; top: -2px; right: -2px; width: 14px; height: 14px;
+      border-radius: 50%; background: var(--bg-panel); border: 1px solid rgba(0,216,238,0.3);
+      display: flex; align-items: center; justify-content: center; color: var(--cyan); font-size: 6px;
+    }
+    .hub-title { font-family: 'Orbitron', sans-serif; font-size: 12px; font-weight: 600; margin-bottom: 4px; letter-spacing: 0.05em; }
+    .hub-desc { font-family: 'Share Tech Mono', monospace; font-size: 9px; color: var(--textDim); text-align: center; max-width: 300px; line-height: 1.6; margin-bottom: 8px; }
+    .hub-status { display: flex; align-items: center; gap: 6px; font-family: 'Share Tech Mono', monospace; font-size: 8px; color: var(--textDim); text-transform: uppercase; letter-spacing: 0.1em; }
+    .hub-status .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); }
+    .hub-status .sep { color: var(--b1); }
+
+    /* Right Panel */
+    .right-panel { width: 330px; display: flex; flex-direction: column; gap: 12px; flex-shrink: 0; }
+
+    .transcription-header { display: flex; align-items: center; justify-content: space-between; }
+    .transcription-header .left { display: flex; align-items: center; gap: 8px; }
+    .transcription-header .title {
+      font-family: 'Share Tech Mono', monospace; font-size: 10px; font-weight: 700;
+      color: var(--text); letter-spacing: 0.15em;
+      border-bottom: 1px solid rgba(0,216,238,0.3); padding-bottom: 2px;
+    }
+    .tab-btns { display: flex; gap: 4px; }
+    .tab-btn {
+      padding: 4px 10px; border-radius: 6px; border: 1px solid var(--b2);
+      font-family: 'Rajdhani', sans-serif; font-size: 9px; font-weight: 500;
+      cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 4px;
+      background: none;
+    }
+    .tab-btn.active { background: rgba(0,216,238,0.1); color: var(--cyan); border-color: rgba(0,216,238,0.5); }
+    .tab-btn.inactive { color: var(--textDim); }
+    .tab-btn.inactive:hover { background: var(--bg-hover); color: var(--text); }
+
+    .chat-panel {
+      background: var(--bg-card); border: 1px solid var(--b1); border-radius: 12px;
+      flex: 1; display: flex; flex-direction: column; min-height: 0; overflow: hidden;
+    }
+
+    .toggle-row {
+      padding: 10px; border-bottom: 1px solid var(--b1);
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .toggle-item { display: flex; align-items: center; justify-content: space-between; }
+    .toggle-label {
+      display: flex; align-items: center; gap: 6px;
+      font-family: 'Share Tech Mono', monospace; font-size: 9px; color: var(--textMuted);
+      text-transform: uppercase; letter-spacing: 0.1em;
+    }
+    .toggle-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--teal); animation: pulse 2s ease-in-out infinite;
+      box-shadow: 0 0 6px rgba(0,245,212,0.8);
+    }
+    .toggle-switch {
+      width: 28px; height: 14px; border-radius: 9999px;
+      position: relative; cursor: pointer; transition: all 0.3s;
+    }
+    .toggle-switch.on { background: rgba(0,245,212,0.3); }
+    .toggle-switch.off { background: var(--bg-hover); }
+    .toggle-switch .knob {
+      position: absolute; top: 2px; width: 10px; height: 10px; border-radius: 50%;
+      transition: all 0.3s;
+    }
+    .toggle-switch.on .knob { left: 14px; background: var(--teal); box-shadow: 0 0 6px rgba(0,245,212,0.8); }
+    .toggle-switch.off .knob { left: 2px; background: var(--textDim); }
+    .toggle-switch.primary.on { background: rgba(0,216,238,0.3); }
+    .toggle-switch.primary.on .knob { background: var(--cyan); box-shadow: 0 0 6px rgba(0,216,238,0.8); }
+    .toggle-sublabel { font-family: 'Share Tech Mono', monospace; font-size: 7px; color: var(--textDim); }
+
+    /* Message Area */
+    .messages { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 12px; }
+    .messages::-webkit-scrollbar { width: 4px; }
+    .messages::-webkit-scrollbar-track { background: transparent; }
+    .messages::-webkit-scrollbar-thumb { background: linear-gradient(180deg, rgba(0,216,238,0.3), rgba(0,245,212,0.3)); border-radius: 2px; }
+    .message { display: flex; flex-direction: column; gap: 4px; }
+    .message.user { align-items: flex-end; }
+    .message.ai { align-items: flex-start; }
+    .msg-meta { display: flex; align-items: center; gap: 8px; font-family: 'Share Tech Mono', monospace; font-size: 8px; color: var(--textDim); text-transform: uppercase; letter-spacing: 0.1em; }
+    .msg-dot {
+      width: 4px; height: 4px; border-radius: 50%;
+      background: var(--cyan); animation: pulse 2s ease-in-out infinite;
+      box-shadow: 0 0 4px rgba(0,216,238,0.8);
+    }
+    .msg-bubble {
+      padding: 8px 12px; border-radius: 8px; font-size: 12px;
+      font-family: 'Rajdhani', sans-serif; line-height: 1.5;
+      max-width: 90%;
+    }
+    .msg-bubble.user { background: rgba(0,216,238,0.1); border: 1px solid rgba(0,216,238,0.2); }
+    .msg-bubble.ai { background: rgba(13,21,32,0.5); border: 1px solid var(--b1); }
+
+    /* Message Input */
+    .msg-input-wrap { padding: 10px; border-top: 1px solid var(--b1); }
+    .msg-input {
+      width: 100%; padding: 8px 12px; border-radius: 8px;
+      background: rgba(22,31,42,0.5); border: 1px solid var(--b2);
+      color: var(--text); font-family: 'Rajdhani', sans-serif; font-size: 12px;
+      outline: none; transition: all 0.2s;
+    }
+    .msg-input:focus { border-color: var(--cyan); box-shadow: 0 0 0 1px rgba(0,216,238,0.3); }
+    .msg-input::placeholder { color: var(--textDim); }
+
+    /* Footer */
+    .footer {
+      padding: 8px 24px; display: flex; align-items: center; justify-content: space-between;
+      font-family: 'Share Tech Mono', monospace; font-size: 9px; color: var(--textDim);
+      letter-spacing: 0.1em; text-transform: uppercase;
+      border-top: 1px solid var(--b1);
+    }
+
+    /* Animations */
+    @keyframes pulse {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 1; }
+    }
+    @keyframes nodePulse {
+      0%, 100% { transform: scale(1); opacity: 0.8; }
+      50% { transform: scale(1.1); opacity: 1; }
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Sphere Canvas */
+    .sphere-canvas { width: 100%; height: 100%; }
+    .conn-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- Top Navigation -->
+    <header class="top-nav">
+      <div class="logo-area">
+        <div class="logo-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M15 2v2"/><path d="M15 20v2"/><path d="M2 15h2"/><path d="M2 9h2"/><path d="M20 15h2"/><path d="M20 9h2"/><path d="M9 2v2"/><path d="M9 20v2"/></svg>
+          <div class="logo-dot"></div>
+        </div>
+        <div>
+          <div class="logo-title">J.R.R.V.I.S</div>
+          <div class="logo-subtitle">Just A Rather Very Intelligent System</div>
+        </div>
+      </div>
+      <nav class="nav-tabs">
+        <button class="nav-tab active" onclick="switchTab(this)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/></svg>
+          Intelligence
+        </button>
+        <button class="nav-tab" onclick="switchTab(this)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          Notes
+        </button>
+        <button class="nav-tab" onclick="switchTab(this)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          Tasks
+        </button>
+        <button class="nav-tab" onclick="switchTab(this)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Contacts
+        </button>
+      </nav>
+      <button class="settings-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Left Action Buttons -->
+      <div class="left-actions">
+        <button class="action-btn primary">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00d8ee" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span class="label" style="color: #00d8ee;">IMPORT</span>
+        </button>
+        <div class="divider"></div>
+        <button class="action-btn dim">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          <span class="label" style="color: rgba(100,116,139,0.6);">STONIC_<br>DSKTP</span>
+        </button>
+        <div class="divider"></div>
+        <button class="action-btn dim">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
+          <span class="label" style="color: rgba(100,116,139,0.6);">MY AI<br>DOCS</span>
+        </button>
+      </div>
+
+      <!-- Center Cards -->
+      <div class="center-cards">
+        <div class="input-card cyan">
+          <div class="input-icon cyan-bg">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+          </div>
+          <div class="input-label">
+            <span class="main" style="color: var(--text);">ADD FILES</span>
+            <span class="sub" style="color: rgba(0,216,238,0.8);">MULTIMODAL INPUT</span>
+          </div>
+        </div>          <div class="input-card red">
+          <div class="input-icon red-bg">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 0 1 10 10c0 5.52-4.48 10-10 10S2 17.52 2 12 6.48 2 12 2z"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+          </div>
+          <div class="input-label">
+            <span class="main" style="color: var(--text);">MEMORY</span>
+            <span class="sub" style="color: rgba(239,68,68,0.8);">SYSTEM ACCESS</span>
+          </div>
+        </div>
+        <div class="input-card blue">
+          <div class="input-icon blue-bg">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div class="input-label">
+            <span class="main" style="color: var(--text);">HISTORY</span>
+            <span class="sub" style="color: rgba(59,130,246,0.8);">SYSTEM ACCESS</span>
+          </div>
+        </div>
+        <div class="input-card slate">
+          <div class="input-icon slate-bg">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div class="input-label">
+            <span class="main" style="color: var(--text);">USER</span>
+            <span class="sub" style="color: rgba(100,116,139,0.8);">SYSTEM ACCESS</span>
+          </div>
+        </div>
+        <div class="input-card amber">
+          <div class="input-icon amber-bg">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          </div>
+          <div class="input-label">
+            <span class="main" style="color: var(--text);">SETTINGS</span>
+            <span class="sub" style="color: rgba(245,158,11,0.8);">CONFIGURATION</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Connection Lines + Sphere -->
+      <div class="connection-area">
+        <canvas class="conn-canvas" id="connCanvas"></canvas>
+      </div>
+
+      <!-- Sphere Area -->
+      <div class="sphere-area">
+        <div class="sphere-canvas-wrap">
+          <canvas class="sphere-canvas" id="sphereCanvas"></canvas>
+          <div class="sphere-status">
+            <span>STANDBY MODE</span>
+          </div>
+        </div>
+        <div class="init-btn-wrap">
+          <button class="init-btn">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            INITIALIZE AI
+          </button>
+        </div>
+      </div>
+
+      <!-- Right Panel -->
+      <div class="right-panel">
+        <div class="transcription-header">
+          <div class="left">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00d8ee" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+            <span class="title">SYSTEM_TRANSCRIPTION</span>
+          </div>
+          <div class="tab-btns">
+            <button class="tab-btn active">+ CHAT</button>
+            <button class="tab-btn inactive">LOGS</button>
+          </div>
+        </div>
+        <div class="chat-panel">
+          <div class="toggle-row">
+            <div class="toggle-item">
+              <div class="toggle-label">
+                <div class="toggle-dot"></div>
+                Deep Reasoning
+              </div>
+              <div class="toggle-switch on" onclick="this.classList.toggle('on');this.classList.toggle('off')">
+                <div class="knob"></div>
+              </div>
+            </div>
+            <div class="toggle-item">
+              <span class="toggle-sublabel">Fast Response Mode</span>
+              <div class="toggle-switch primary on" onclick="this.classList.toggle('on');this.classList.toggle('off')">
+                <div class="knob"></div>
+              </div>
+            </div>
+          </div>
+          <div class="messages">
+            <div class="message ai">
+              <div class="msg-meta">
+                <div class="msg-dot"></div>
+                STONIC_RESPONSE
+              </div>
+              <div class="msg-bubble ai">System initialized. Awaiting voice commands or text input. All modules are operational.</div>
+            </div>
+          </div>
+          <div class="msg-input-wrap">
+            <input class="msg-input" type="text" placeholder="Type a message or press INITIALIZE AI to begin voice mode...">
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <div class="footer">
+      <span>SYSTEM_OFFLINE</span>
+      <span>V2.0.1-BETA</span>
+      <span>"System ready — Click INITIALIZE AI to start"</span>
+    </div>
+  </div>
+
+  <script>
+    // Tab switching
+    function switchTab(el) {
+      document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+    }
+
+    // Connection Lines Canvas
+    const connCanvas = document.getElementById('connCanvas');
+    const connCtx = connCanvas.getContext('2d');
+    let connAnimFrame;
+
+    function resizeConn() {
+      const dpr = window.devicePixelRatio || 1;
+      const rect = connCanvas.getBoundingClientRect();
+      if (!connCtx) return; /* guard AFTER rect so a later valid ctx can resize */
+      connCanvas.width  = Math.max(1, Math.floor(rect.width  * dpr));
+      connCanvas.height = Math.max(1, Math.floor(rect.height * dpr));
+      connCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      connCtx.clearRect(0, 0, connCanvas.width, connCanvas.height); /* cheap insurance */
+    }
+
+    const particles = [];
+    for (let lineIdx = 0; lineIdx < 5; lineIdx++) {
+      for (let i = 0; i < 5; i++) {
+        particles.push({
+          t: i / 5,
+          speed: 0.01 + Math.random() * 0.005,
+          lineIndex: lineIdx,
+        });
+      }
+    }
+
+    function animateConn() {
+      const rect = connCanvas.getBoundingClientRect();
+      const w = rect.width;
+      const h = rect.height;
+      connCtx.clearRect(0, 0, w, h);
+
+      const lineColors = [
+        { main: 'rgba(0, 216, 238, 0.7)', glow: 'rgba(0, 216, 238, 0.4)' },
+        { main: 'rgba(239, 68, 68, 0.7)', glow: 'rgba(239, 68, 68, 0.4)' },
+        { main: 'rgba(59, 130, 246, 0.7)', glow: 'rgba(59, 130, 246, 0.4)' },
+        { main: 'rgba(200, 210, 230, 0.6)', glow: 'rgba(200, 210, 230, 0.3)' },
+        { main: 'rgba(245, 158, 11, 0.7)', glow: 'rgba(245, 158, 11, 0.4)' },
+      ];
+
+      const cardH = 56, cardGap = 8;
+      const totalCardSpace = (cardH * 5) + (cardGap * 4);
+      const startY = (h - totalCardSpace) / 2;
+      const cardYPositions = Array.from({length: 5}, (_, i) => startY + cardH * (i + 0.5) + cardGap * i);
+      const cardX = 0, funnelX = w * 0.45, funnelY = h * 0.5, aiX = w, aiY = h * 0.5;
+
+      // Draw curved lines
+      lineColors.forEach((color, i) => {
+        connCtx.beginPath();
+        connCtx.moveTo(cardX, cardYPositions[i]);
+        const cp1x = cardX + (funnelX - cardX) * 0.5;
+        const cp2x = funnelX - (funnelX - cardX) * 0.3;
+        connCtx.bezierCurveTo(cp1x, cardYPositions[i], cp2x, funnelY, funnelX, funnelY);
+        connCtx.strokeStyle = color.main;
+        connCtx.lineWidth = i === 1 ? 2.5 : 2;
+        connCtx.lineCap = 'round';
+        connCtx.shadowColor = color.glow;
+        connCtx.shadowBlur = 10;
+        connCtx.stroke();
+        connCtx.shadowBlur = 0;
+      });
+
+      // Draw trunk line
+      connCtx.beginPath();
+      connCtx.moveTo(funnelX, funnelY);
+      connCtx.lineTo(aiX, aiY);
+      connCtx.strokeStyle = 'rgba(0, 216, 238, 0.95)';
+      connCtx.lineWidth = 4;
+      connCtx.lineCap = 'round';
+      connCtx.shadowColor = 'rgba(0, 216, 238, 0.5)';
+      connCtx.shadowBlur = 15;
+      connCtx.stroke();
+      connCtx.shadowBlur = 0;
+
+      // Glow trunk
+      connCtx.beginPath();
+      connCtx.moveTo(funnelX, funnelY);
+      connCtx.lineTo(aiX, aiY);
+      connCtx.strokeStyle = 'rgba(0, 245, 255, 0.3)';
+      connCtx.lineWidth = 10;
+      connCtx.shadowColor = 'rgba(0, 216, 238, 0.4)';
+      connCtx.shadowBlur = 20;
+      connCtx.stroke();
+      connCtx.shadowBlur = 0;
+
+      // Funnel dot
+      connCtx.fillStyle = '#00d8ee';
+      connCtx.shadowColor = 'rgba(0, 216, 238, 0.8)';
+      connCtx.shadowBlur = 15;
+      connCtx.beginPath();
+      connCtx.arc(funnelX, funnelY, 5, 0, Math.PI * 2);
+      connCtx.fill();
+      connCtx.shadowBlur = 0;
+
+      // Animate particles along curves
+      const colors = ['#00d8ee', '#ef4444', '#3b82f6', '#ffffff', '#f59e0b'];
+      particles.forEach(p => {
+        p.t += p.speed;
+        if (p.t > 1) p.t = 0;
+        const i = p.lineIndex;
+        let t = p.t;
+        // Red line (i===1) reverses direction like the React component
+        if (i === 1) { t = 1 - t; }
+        const oneMinusT = 1 - t;
+        const cp1x = cardX + (funnelX - cardX) * 0.5;
+        const cp2x = funnelX - (funnelX - cardX) * 0.3;
+        const x = oneMinusT**3 * cardX + 3*oneMinusT**2*t*cp1x + 3*oneMinusT*t**2*cp2x + t**3*funnelX;
+        const y = oneMinusT**3 * cardYPositions[i] + 3*oneMinusT**2*t*cardYPositions[i] + 3*oneMinusT*t**2*funnelY + t**3*funnelY;
+        connCtx.fillStyle = colors[i];
+        connCtx.shadowColor = colors[i];
+        connCtx.shadowBlur = 8;
+        connCtx.beginPath();
+        connCtx.arc(x, y, 3, 0, Math.PI * 2);
+        connCtx.fill();
+        connCtx.shadowBlur = 0;
+      });
+
+      // Trunk particles
+      for (let i = 0; i < 5; i++) {
+        const trunkT = ((Date.now() / 1000 * 0.4) + (i / 5)) % 1;
+        const trunkX = funnelX + (aiX - funnelX) * trunkT;
+        const alpha = trunkT < 0.2 ? trunkT / 0.2 : (trunkT > 0.8 ? (1 - trunkT) / 0.2 : 1);
+        connCtx.fillStyle = `rgba(0, 216, 238, ${alpha})`;
+        connCtx.shadowColor = 'rgba(0, 216, 238, 0.8)';
+        connCtx.shadowBlur = 12;
+        connCtx.beginPath();
+        connCtx.arc(trunkX, aiY, 3.5, 0, Math.PI * 2);
+        connCtx.fill();
+        connCtx.shadowBlur = 0;
+      }
+
+      connAnimFrame = requestAnimationFrame(animateConn);
+    }
+    // NOTE: Do NOT call animateConn() here. It's started from startAnimations()
+    // after layout settles, otherwise we'd run a parallel loop racing on the
+    // canvas with stale 300x150 dimensions.
+
+    // Particle Sphere Canvas
+    const sphereCanvas = document.getElementById('sphereCanvas');
+    const sCtx = sphereCanvas.getContext('2d');
+    let sphereAnimFrame;
+    let rotation = 0;
+    let pulse = 0;
+
+    function resizeSphere() {
+      const dpr = window.devicePixelRatio || 1;
+      const rect = sphereCanvas.getBoundingClientRect();
+      if (!sCtx) return;
+      sphereCanvas.width  = Math.max(1, Math.floor(rect.width  * dpr));
+      sphereCanvas.height = Math.max(1, Math.floor(rect.height * dpr));
+      sCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      sCtx.clearRect(0, 0, sphereCanvas.width, sphereCanvas.height);
+    }
+
+    // Run initial resize + start animation AFTER layout settled.
+    // Calling getBoundingClientRect() at script-execution time fires
+    // before flex/grid have been resolved, producing 0×huge canvases.
+    function startAnimations() {
+      resizeConn();
+      resizeSphere();
+      animateConn();
+      animateSphere();
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => requestAnimationFrame(startAnimations));
+    } else {
+      requestAnimationFrame(startAnimations);
+    }
+    window.addEventListener('resize', () => { resizeConn(); resizeSphere(); });
+
+    const sphereParticles = [];
+    const particleCount = 600;
+    const radius = 75;
+    const phi = Math.PI * (3 - Math.sqrt(5));
+    for (let i = 0; i < particleCount; i++) {
+      const y = 1 - (i / (particleCount - 1)) * 2;
+      const radiusAtY = Math.sqrt(1 - y * y) * radius;
+      const theta = phi * i;
+      sphereParticles.push({
+        baseX: Math.cos(theta) * radiusAtY,
+        baseY: y * radius,
+        baseZ: Math.sin(theta) * radiusAtY,
+        size: Math.random() * 1.2 + 0.8,
+        opacity: Math.random() * 0.4 + 0.5,
+      });
+    }
+
+    function animateSphere() {
+      const rect = sphereCanvas.getBoundingClientRect();
+      const cx = rect.width / 2;
+      const cy = rect.height / 2;
+      sCtx.clearRect(0, 0, rect.width, rect.height);
+
+      rotation += 0.0015;
+      pulse += 0.05;
+
+      const sorted = sphereParticles.map(p => {
+        const cos = Math.cos(rotation), sin = Math.sin(rotation);
+        let rx = p.baseX * cos - p.baseZ * sin;
+        let rz = p.baseX * sin + p.baseZ * cos;
+        let ry = p.baseY;
+        return { ...p, x: rx, y: ry, z: rz,
+          currentOpacity: p.opacity * (0.7 + 0.3 * Math.sin(pulse * 0.05 + p.baseY * 0.03))
+        };
+      }).sort((a, b) => b.z - a.z);
+
+      sorted.forEach(p => {
+        const scale = 200 / (200 + p.z);
+        const x = cx + p.x * scale;
+        const y = cy + p.y * scale;
+        const size = p.size * scale;
+        const edgeFade = Math.max(0, Math.min(1, (p.z + 75) / 30));
+        const hf = (p.y + 75) / 150;
+        const r = Math.floor(180 + hf * 20);
+        const g = Math.floor(210 + hf * 45);
+        const b = Math.floor(238 + hf * 17);
+        sCtx.fillStyle = `rgba(${r}, ${g}, ${b}, ${p.currentOpacity * 0.8 * edgeFade})`;
+        if (p.z > -30) {
+          sCtx.fillStyle = `rgba(0, 216, 238, ${p.currentOpacity * 0.15})`;
+          sCtx.beginPath();
+          sCtx.arc(x, y, size * 3, 0, Math.PI * 2);
+          sCtx.fill();
+        }
+        sCtx.fillStyle = `rgba(${r}, ${g}, ${b}, ${p.currentOpacity * 0.8 * edgeFade})`;
+        sCtx.beginPath();
+        sCtx.arc(x, y, size, 0, Math.PI * 2);
+        sCtx.fill();
+      });
+
+      // Ring glow
+      const ringGrad = sCtx.createRadialGradient(cx, cy, 70, cx, cy, 85);
+      const rp = 0.15 + 0.05 * Math.sin(pulse * 0.3);
+      ringGrad.addColorStop(0, 'rgba(255,255,255,0)');
+      ringGrad.addColorStop(0.7, `rgba(200,230,255,${rp * 0.5})`);
+      ringGrad.addColorStop(0.9, `rgba(255,255,255,${rp})`);
+      ringGrad.addColorStop(1, 'rgba(255,255,255,0)');
+      sCtx.fillStyle = ringGrad;
+      sCtx.beginPath();
+      sCtx.arc(cx, cy, 85, 0, Math.PI * 2);
+      sCtx.fill();
+
+      // Outer glow
+      const og = sCtx.createRadialGradient(cx, cy, 80, cx, cy, 120);
+      og.addColorStop(0, 'rgba(0,216,238,0.03)');
+      og.addColorStop(1, 'rgba(0,216,238,0)');
+      sCtx.fillStyle = og;
+      sCtx.beginPath();
+      sCtx.arc(cx, cy, 120, 0, Math.PI * 2);
+      sCtx.fill();
+
+      sphereAnimFrame = requestAnimationFrame(animateSphere);
+    }
+    // animateSphere() also only started from startAnimations() — see note above.
+  </script>
+</body>
+</html>

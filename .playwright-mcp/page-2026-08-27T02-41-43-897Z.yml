@@ -1,0 +1,301 @@
+- generic [ref=f11e3]:
+  - banner [ref=f11e4]:
+    - generic [ref=f11e12]:
+      - heading "J.R.R.V.I.S" [level=1] [ref=f11e13]
+      - text: Just A Rather Very Intelligent System
+    - navigation [ref=f11e14]:
+      - button "Intelligence" [ref=f11e15] [cursor=pointer]
+      - button "Notes" [ref=f11e22] [cursor=pointer]
+      - button "Tasks" [ref=f11e28] [cursor=pointer]
+      - button "Contacts" [ref=f11e34] [cursor=pointer]
+      - button "AI Workforce" [ref=f11e43] [cursor=pointer]
+      - button "Organization" [ref=f11e49] [cursor=pointer]
+      - button "Dashboard" [ref=f11e56] [cursor=pointer]
+      - button "Integrations" [ref=f11e64] [cursor=pointer]
+      - button "Control UI" [ref=f11e69] [cursor=pointer]
+    - generic [ref=f11e74]:
+      - generic [ref=f11e75]: Online
+      - button "Command palette (Ctrl+K)" [ref=f11e77] [cursor=pointer]
+      - button [ref=f11e81] [cursor=pointer]
+  - main [ref=f11e85]:
+    - generic [ref=f11e86]:
+      - generic [ref=f11e87]:
+        - generic [ref=f11e88]:
+          - generic: camera offline
+          - button "Turn on camera" [ref=f11e89] [cursor=pointer]
+        - generic [ref=f11e94]:
+          - generic [ref=f11e95]:
+            - generic [ref=f11e96]: "mediaDevices:"
+            - generic [ref=f11e97]: "yes"
+          - generic [ref=f11e98]:
+            - generic [ref=f11e99]: "getUserMedia:"
+            - generic [ref=f11e100]: "yes"
+          - generic [ref=f11e101]:
+            - generic [ref=f11e102]: "secureContext:"
+            - generic [ref=f11e103]: "yes"
+      - generic [ref=f11e108]:
+        - generic [ref=f11e109]:
+          - heading "Today Headlines" [level=3] [ref=f11e110]
+          - button [ref=f11e112] [cursor=pointer]
+        - generic [ref=f11e118]:
+          - paragraph [ref=f11e120]: AI breakthrough in quantum computing announced
+          - paragraph [ref=f11e122]: Global markets respond to new economic policies
+          - paragraph [ref=f11e124]: SpaceX launches next-gen satellite constellation
+          - paragraph [ref=f11e126]: New renewable energy milestone reached
+    - generic [ref=f11e307]:
+      - generic [ref=f11e308]:
+        - button "Chat" [ref=f11e309] [cursor=pointer]
+        - button "Harness Control" [active] [ref=f11e312] [cursor=pointer]
+      - generic [ref=f11e415]:
+        - complementary [ref=f11e416]:
+          - generic [ref=f11e417]:
+            - generic [ref=f11e422]:
+              - generic [ref=f11e423]: Harness Control
+              - generic [ref=f11e424]: 12-Pillar Runtime
+            - generic [ref=f11e425]:
+              - generic [ref=f11e426]: Pillars
+              - generic [ref=f11e429]: 24/32
+          - generic [ref=f11e430]:
+            - generic [ref=f11e431]:
+              - generic [ref=f11e432]:
+                - generic [ref=f11e435]: AUTONOMY
+                - generic [ref=f11e436]: 4/5
+              - generic [ref=f11e437]:
+                - button "Autonomous Missions" [ref=f11e438] [cursor=pointer]
+                - button "Background Execution" [ref=f11e442] [cursor=pointer]
+                - button "Proactive Intelligence" [ref=f11e446] [cursor=pointer]
+                - button "Self Evaluation" [ref=f11e450] [cursor=pointer]
+                - button "Self Improvement" [ref=f11e454] [cursor=pointer]
+            - generic [ref=f11e458]:
+              - generic [ref=f11e459]:
+                - generic [ref=f11e463]: COMPUTER
+                - generic [ref=f11e464]: 2/7
+              - generic [ref=f11e465]:
+                - button "Desktop Control" [ref=f11e466] [cursor=pointer]
+                - button "Browser Control" [ref=f11e470] [cursor=pointer]
+                - button "Terminal" [ref=f11e474] [cursor=pointer]
+                - button "Vision" [ref=f11e478] [cursor=pointer]
+                - button "Filesystem" [ref=f11e482] [cursor=pointer]
+                - button "Mobile Devices" [ref=f11e486] [cursor=pointer]
+                - button "Remote Devices" [ref=f11e490] [cursor=pointer]
+            - generic [ref=f11e494]:
+              - generic [ref=f11e495]:
+                - generic [ref=f11e501]: AGENTS
+                - generic [ref=f11e502]: 4/5
+              - generic [ref=f11e503]:
+                - button "Multi-Agent Coordination" [ref=f11e504] [cursor=pointer]
+                - button "Agent Spawning" [ref=f11e508] [cursor=pointer]
+                - button "Agent Delegation" [ref=f11e512] [cursor=pointer]
+                - button "Parallel Execution" [ref=f11e516] [cursor=pointer]
+                - button "Agent Reviews" [ref=f11e520] [cursor=pointer]
+            - generic [ref=f11e524]:
+              - generic [ref=f11e525]:
+                - generic [ref=f11e534]: INTELLIGENCE
+                - generic [ref=f11e535]: 5/5
+              - generic [ref=f11e536]:
+                - button "Model Router" [ref=f11e537] [cursor=pointer]
+                - button "Progressive Tools" [ref=f11e541] [cursor=pointer]
+                - button "Deep Programmability" [ref=f11e545] [cursor=pointer]
+                - button "Knowledge Graph" [ref=f11e549] [cursor=pointer]
+                - button "DNA Memory" [ref=f11e553] [cursor=pointer]
+            - generic [ref=f11e557]:
+              - generic [ref=f11e558]:
+                - generic [ref=f11e561]: EXECUTION
+                - generic [ref=f11e562]: 6/6
+              - generic [ref=f11e563]:
+                - button "Task Graphs" [ref=f11e564] [cursor=pointer]
+                - button "Sandboxing" [ref=f11e568] [cursor=pointer]
+                - button "Verification" [ref=f11e572] [cursor=pointer]
+                - button "Recovery" [ref=f11e576] [cursor=pointer]
+                - button "Lifecycle Hooks" [ref=f11e580] [cursor=pointer]
+                - button "Event System" [ref=f11e584] [cursor=pointer]
+            - generic [ref=f11e588]:
+              - generic [ref=f11e589]:
+                - generic [ref=f11e592]: DEVELOPER
+                - generic [ref=f11e593]: 3/4
+              - generic [ref=f11e594]:
+                - button "SDK" [ref=f11e595] [cursor=pointer]
+                - button "MCP Gateway" [ref=f11e599] [cursor=pointer]
+                - button "API" [ref=f11e603] [cursor=pointer]
+                - button "CLI" [ref=f11e607] [cursor=pointer]
+          - generic [ref=f11e611]:
+            - generic [ref=f11e612]:
+              - generic [ref=f11e613]: Gateway
+              - generic [ref=f11e614]: ● online
+            - generic [ref=f11e615]:
+              - generic [ref=f11e616]: Missions
+              - generic [ref=f11e617]: 1 active · 1 queued
+            - generic [ref=f11e618]:
+              - generic [ref=f11e619]: Agents
+              - generic [ref=f11e620]: 2 running
+        - main:
+          - generic:
+            - generic [ref=f11e621]:
+              - generic [ref=f11e622]:
+                - generic [ref=f11e623]: Elite Loop
+                - generic [ref=f11e627]: Canonical execution flow
+              - generic:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic: EXECUTE
+                      - generic: Phase 9/18
+              - generic [ref=f11e628]:
+                - generic [ref=f11e629]: Perceive
+                - generic [ref=f11e630]: Context
+                - generic [ref=f11e631]: Reason
+                - generic [ref=f11e632]: Plan
+                - generic [ref=f11e633]: Policy
+                - generic [ref=f11e634]: Allocate
+                - generic [ref=f11e635]: Select Agent
+                - generic [ref=f11e636]: Select Tool
+                - generic [ref=f11e637]: Execute
+                - generic [ref=f11e638]: Observe
+                - generic [ref=f11e639]: Verify
+                - generic [ref=f11e640]: Detect Error
+                - generic [ref=f11e641]: Recover
+                - generic [ref=f11e642]: Validate
+                - generic [ref=f11e643]: Remember
+                - generic [ref=f11e644]: Reflect
+                - generic [ref=f11e645]: Update
+                - generic [ref=f11e646]: Next
+            - generic [ref=f11e647]:
+              - generic [ref=f11e648]: Autonomy
+              - generic [ref=f11e652]:
+                - button "L0 Observe Inspect and analyze only" [ref=f11e653] [cursor=pointer]:
+                  - generic:
+                    - generic [ref=f11e654]: L0
+                    - generic [ref=f11e655]: Observe
+                  - generic [ref=f11e656]: Inspect and analyze only
+                - button "L1 Recommend Propose actions" [ref=f11e657] [cursor=pointer]:
+                  - generic:
+                    - generic [ref=f11e658]: L1
+                    - generic [ref=f11e659]: Recommend
+                  - generic [ref=f11e660]: Propose actions
+                - button "L2 Execute Safe Routine reversible work" [ref=f11e661] [cursor=pointer]:
+                  - generic:
+                    - generic [ref=f11e662]: L2
+                    - generic [ref=f11e663]: Execute Safe
+                  - generic [ref=f11e664]: Routine reversible work
+                - button "L3 Autonomous Plan and execute missions" [ref=f11e665] [cursor=pointer]:
+                  - generic:
+                    - generic [ref=f11e666]: L3
+                    - generic [ref=f11e667]: Autonomous
+                  - generic [ref=f11e668]: Plan and execute missions
+                - button "L4 Self-Improve Develop & test improvements" [ref=f11e669] [cursor=pointer]:
+                  - generic:
+                    - generic [ref=f11e670]: L4
+                    - generic [ref=f11e671]: Self-Improve
+                  - generic [ref=f11e672]: Develop & test improvements
+                - button "L5 High-Impact Requires explicit authorization" [ref=f11e673] [cursor=pointer]:
+                  - generic:
+                    - generic [ref=f11e674]: L5
+                    - generic [ref=f11e675]: High-Impact
+                  - generic [ref=f11e676]: Requires explicit authorization
+          - generic:
+            - generic [ref=f11e677]:
+              - generic: Verify
+              - generic:
+                - generic:
+                  - generic [ref=f11e681]: Passed
+                  - generic [ref=f11e682]: "847"
+                - generic:
+                  - generic [ref=f11e683]: Failed
+                  - generic [ref=f11e684]: "23"
+                - generic:
+                  - generic [ref=f11e685]: Pass Rate
+                  - generic [ref=f11e686]: 97.4%
+            - generic [ref=f11e687]:
+              - generic: Recover
+              - generic:
+                - generic:
+                  - generic [ref=f11e692]: Retries
+                  - generic [ref=f11e693]: "31"
+                - generic:
+                  - generic [ref=f11e694]: Replans
+                  - generic [ref=f11e695]: "7"
+                - generic:
+                  - generic [ref=f11e696]: Escalations
+                  - generic [ref=f11e697]: "2"
+                - generic: "Last: retry → success (2m ago)"
+            - generic [ref=f11e698]:
+              - generic: Learn
+              - generic:
+                - generic:
+                  - generic [ref=f11e702]: Reflections
+                  - generic [ref=f11e703]: "84"
+                - generic:
+                  - generic [ref=f11e704]: Proposals
+                  - generic [ref=f11e705]: "12"
+                - generic:
+                  - generic [ref=f11e706]: Deployed
+                  - generic [ref=f11e707]: "5"
+                - generic: "Last lesson: prefer fast model for parsing"
+            - generic [ref=f11e708]:
+              - generic: Events
+              - generic:
+                - generic:
+                  - generic [ref=f11e715]: Triggers
+                  - generic [ref=f11e716]: "6"
+                - generic:
+                  - generic [ref=f11e717]: Heartbeat
+                  - generic [ref=f11e718]: ● 2s
+                - generic:
+                  - generic [ref=f11e719]: Webhooks
+                  - generic [ref=f11e720]: "2"
+                - generic: "Cron: daily report at 09:00"
+        - complementary [ref=f11e721]:
+          - generic [ref=f11e722]:
+            - button "missions" [ref=f11e723] [cursor=pointer]
+            - button "agents" [ref=f11e724] [cursor=pointer]
+            - button "memory" [ref=f11e725] [cursor=pointer]
+            - button "audit" [ref=f11e726] [cursor=pointer]
+          - generic [ref=f11e728]:
+            - generic [ref=f11e729]: Active Missions
+            - generic [ref=f11e730]:
+              - generic [ref=f11e731]:
+                - generic [ref=f11e733]: Deploy marketing site
+                - generic [ref=f11e734]: running
+              - generic [ref=f11e737]: 2/5 tasks · 40%
+            - generic [ref=f11e738]:
+              - generic [ref=f11e739]:
+                - generic [ref=f11e741]: Research Claude release
+                - generic [ref=f11e742]: queued
+              - generic [ref=f11e744]: 0/3 tasks · 0%
+            - generic [ref=f11e745]:
+              - generic [ref=f11e746]:
+                - generic [ref=f11e748]: "Fix auth bug #142"
+                - generic [ref=f11e749]: completed
+              - generic [ref=f11e752]: 4/4 tasks · 100%
+    - generic [ref=f11e245]:
+      - generic [ref=f11e246]:
+        - generic [ref=f11e247]: SYSTEM_TRANSCRIPTION
+        - generic [ref=f11e253]:
+          - button "+ CHAT" [ref=f11e254] [cursor=pointer]:
+            - generic [ref=f11e255]: +
+            - text: CHAT
+          - button "LOGS" [ref=f11e256] [cursor=pointer]
+      - generic [ref=f11e257]:
+        - generic [ref=f11e258]:
+          - generic [ref=f11e259]:
+            - generic [ref=f11e260]: Deep Reasoning
+            - button [ref=f11e264] [cursor=pointer]
+          - generic [ref=f11e266]:
+            - generic [ref=f11e267]: Fast Response Mode
+            - button [ref=f11e268] [cursor=pointer]
+        - generic [ref=f11e270]: No messages yet
+        - generic [ref=f11e272]:
+          - generic [ref=f11e273]:
+            - button "Control UI" [ref=f11e274] [cursor=pointer]
+            - button "Run agent" [ref=f11e277] [cursor=pointer]
+            - button "Tasks" [ref=f11e281] [cursor=pointer]
+          - generic [ref=f11e285]:
+            - generic [ref=f11e286]:
+              - textbox "Type your message..." [ref=f11e287]
+              - button [ref=f11e288] [cursor=pointer]
+            - button [disabled] [ref=f11e292]
+      - generic [ref=f11e296]:
+        - generic [ref=f11e297]:
+          - generic [ref=f11e298]: SYSTEM_OFFLINE
+          - generic [ref=f11e301]: V2.0.1-BETA
+        - generic [ref=f11e302]: System ready - Click INITIALIZE AI to start

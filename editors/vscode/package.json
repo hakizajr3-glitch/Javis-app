@@ -1,0 +1,76 @@
+{
+  "name": "jarvis-vscode",
+  "displayName": "J.A.R.V.I.S.",
+  "description": "J.A.R.V.I.S. agent harness integration for VS Code",
+  "version": "0.1.0",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "AI",
+    "Machine Learning",
+    "Chat"
+  ],
+  "activationEvents": [
+    "onCommand:jarvis.openPanel",
+    "onCommand:jarvis.runAgentOnSelection"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "jarvis.openPanel",
+        "title": "Open J.A.R.V.I.S. Panel",
+        "category": "J.A.R.V.I.S."
+      },
+      {
+        "command": "jarvis.runAgentOnSelection",
+        "title": "Run Agent on Selection",
+        "category": "J.A.R.V.I.S."
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "jarvis.runAgentOnSelection",
+          "group": "jarvis@1"
+        }
+      ]
+    },
+    "views": {
+      "explorer": [
+        {
+          "id": "jarvisRuns",
+          "name": "J.A.R.V.I.S. Runs",
+          "when": "jarvis.enabled"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "J.A.R.V.I.S.",
+      "properties": {
+        "jarvis.gatewayUrl": {
+          "type": "string",
+          "default": "ws://localhost:18789",
+          "description": "J.A.R.V.I.S. gateway WebSocket URL"
+        },
+        "jarvis.apiKey": {
+          "type": "string",
+          "default": "",
+          "description": "API key for J.A.R.V.I.S. gateway"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node",
+    "watch": "npm run build -- --watch",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.85.0",
+    "esbuild": "^0.21.0",
+    "typescript": "^5.3.0"
+  }
+}

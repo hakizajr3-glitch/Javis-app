@@ -1,0 +1,433 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { 
+  Plus, Folder, FolderOpen, Paperclip, Brain, 
+  Clock, User, Loader2, Zap 
+} from 'lucide-react';
+
+// Wireframe Sphere Animation Component
+const WireframeSphere: React.FC<{ initializing: boolean }> = ({ initializing }) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animationRef = useRef<number>(0);
+  const rotationRef = useRef(0);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const resize = () => {
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * 2;
+      canvas.height = rect.height * 2;
+      ctx.scale(2, 2);
+    };
+    resize();
+    window.addEventListener('resize', resize);
+
+    // Sphere parameters
+    const radius = 80;
+    const points: { x: number; y: number; z: number }[] = [];
+    const lines: [number, number][] = [];
+
+    // Create icosphere points
+    const phi = (1 + Math.sqrt(5)) / 2;
+    const vertices = [
+      [-1, phi, 0], [1, phi, 0], [-1, -phi, 0], [1, -phi, 0],
+      [0, -1, phi], [0, 1, phi], [0, -1, -phi], [0, 1, -phi],
+      [phi, 0, -1], [phi, 0, 1], [-phi, 0, -1], [-phi, 0, 1]
+    ];
+
+    vertices.forEach(v => {
+      const len = Math.sqrt(v[0]**2 + v[1]**2 + v[2]**2);
+      points.push({
+        x: (v[0] / len) * radius,
+        y: (v[1] / len) * radius,
+        z: (v[2] / len) * radius
+      });
+    });
+
+    // Create edges
+    const edges = [
+      [0,1], [0,5], [0,7], [0,10], [0,11],
+      [1,5], [1,7], [1,8], [1,9],
+      [2,3], [2,4], [2,6], [2,10], [2,11],
+      [3,4], [3,6], [3,8], [3,9],
+      [4,5], [4,9], [4,11],
+      [5,9], [5,11],
+      [6,7], [6,8], [6,10],
+      [7,8], [7,10],
+      [8,9], [10,11]
+    ];
+    edges.forEach(e => lines.push(e as [number, number]));
+
+    const animate = () => {
+      const rect = canvas.getBoundingClientRect();
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+
+      ctx.clearRect(0, 0, rect.width, rect.height);
+      
+      rotationRef.current += 0.005;
+      const rot = rotationRef.current;
+
+      // Draw outer glow ring
+      const gradient = ctx.createRadialGradient(centerX, centerY, radius * 0.8, centerX, centerY, radius * 1.3);
+      gradient.addColorStop(0, 'rgba(0, 216, 238, 0)');
+      gradient.addColorStop(0.5, 'rgba(0, 216, 238, 0.1)');
+      gradient.addColorStop(1, 'rgba(0, 216, 238, 0)');
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius * 1.3, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Project and draw points
+      const projected = points.map(p => {
+        // Rotate around Y axis
+        const x1 = p.x * Math.cos(rot) - p.z * Math.sin(rot);
+        const z1 = p.x * Math.sin(rot) + p.z * Math.cos(rot);
+        // Rotate around X axis
+        const y2 = p.y * Math.cos(rot * 0.5) - z1 * Math.sin(rot * 0.5);
+        const z2 = p.y * Math.sin(rot * 0.5) + z1 * Math.cos(rot * 0.5);
+        
+        // Perspective projection
+        const scale = 300 / (300 + z2);
+        return {
+          x: centerX + x1 * scale,
+          y: centerY + y2 * scale,
+          z: z2,
+          scale
+        };
+      });
+
+      // Draw edges
+      ctx.strokeStyle = initializing ? 'rgba(0, 245, 212, 0.4)' : 'rgba(0, 216, 238, 0.25)';
+      ctx.lineWidth = 1;
+      lines.forEach(([i, j]) => {
+        const p1 = projected[i];
+        const p2 = projected[j];
+        
+        // Only draw if both points are visible (facing camera)
+        if (p1.z > -100 && p2.z > -100) {
+          ctx.beginPath();
+          ctx.moveTo(p1.x, p1.y);
+          ctx.lineTo(p2.x, p2.y);
+          ctx.stroke();
+        }
+      });
+
+      // Draw points
+      projected.forEach(p => {
+        if (p.z > -100) {
+          const alpha = Math.max(0.3, (p.z + 100) / 200);
+          ctx.fillStyle = `rgba(0, 216, 238, ${alpha})`;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, 2 * p.scale, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      });
+
+      animationRef.current = requestAnimationFrame(animate);
+    };
+
+    animate();
+
+    return () => {
+      window.removeEventListener('resize', resize);
+      cancelAnimationFrame(animationRef.current);
+    };
+  }, [initializing]);
+
+  return (
+    <canvas 
+      ref={canvasRef} 
+      className="w-full h-full"
+      style={{ filter: initializing ? 'drop-shadow(0 0 20px rgba(0, 245, 212, 0.5))' : 'none' }}
+    />
+  );
+};
+
+// Left Panel Buttons
+const LeftPanelButtons: React.FC = () => {
+  const [activeButton, setActiveButton] = useState<string | null>(null);
+
+  const buttons = [
+    { id: 'import', icon: <Plus size={20} />, label: 'IMPORT', color: 'cyan' },
+    { id: 'desktop', icon: <Folder size={20} />, label: 'STONIC_DSKTP', color: 'blue' },
+    { id: 'docs', icon: <FolderOpen size={20} />, label: 'MY AIDOCS', color: 'blue' },
+  ];
+
+  return (
+    <div className="flex flex-col gap-3">
+      {buttons.map((btn) => (
+        <button
+          key={btn.id}
+          onClick={() => setActiveButton(btn.id)}
+          className={`
+            relative w-16 h-16 rounded-2xl flex flex-col items-center justify-center gap-1
+            transition-all duration-300 group
+            ${activeButton === btn.id 
+              ? 'bg-stonic-primary/20 border border-stonic-primary/50 shadow-[0_0_20px_rgba(0,212,255,0.3)]' 
+              : 'bg-stonic-surface/50 border border-stonic-border/30 hover:border-stonic-primary/30 hover:bg-stonic-surfaceHover/50'
+            }
+          `}
+        >
+          <div className={`${btn.color === 'cyan' ? 'text-stonic-primary' : 'text-stonic-textMuted group-hover:text-stonic-primary'} transition-colors`}>
+            {btn.icon}
+          </div>
+          <span className={`text-[7px] font-bold tracking-wider ${btn.color === 'cyan' ? 'text-stonic-primary' : 'text-stonic-textMuted group-hover:text-stonic-primary'}`}>
+            {btn.label}
+          </span>
+          
+          {/* Active indicator */}
+          {activeButton === btn.id && (
+            <div className="absolute -right-1 top-1/2 -translate-y-1/2 w-0.5 h-8 bg-stonic-primary rounded-full shadow-[0_0_10px_rgba(0,212,255,0.8)]" />
+          )}
+        </button>
+      ))}
+    </div>
+  );
+};
+
+// Center Action Buttons
+const CenterActionButtons: React.FC<{ onHover: (id: string | null) => void }> = ({ onHover }) => {
+  const buttons = [
+    { 
+      id: 'addfiles', 
+      icon: <Paperclip size={14} />, 
+      label: 'ADD FILES', 
+      subtitle: 'MULTIMODAL INPUT',
+      color: 'cyan',
+      glowColor: 'rgba(0, 212, 255, 0.3)'
+    },
+    { 
+      id: 'memory', 
+      icon: <Brain size={14} />, 
+      label: 'MEMORY', 
+      subtitle: 'SYSTEM ACCESS',
+      color: 'red',
+      glowColor: 'rgba(239, 68, 68, 0.3)'
+    },
+    { 
+      id: 'history', 
+      icon: <Clock size={14} />, 
+      label: 'HISTORY', 
+      subtitle: 'DOCS & ACCESS',
+      color: 'blue',
+      glowColor: 'rgba(59, 130, 246, 0.3)'
+    },
+    { 
+      id: 'user', 
+      icon: <User size={14} />, 
+      label: 'USER', 
+      subtitle: 'PERSON ACCESS',
+      color: 'purple',
+      glowColor: 'rgba(168, 85, 247, 0.3)'
+    },
+  ];
+
+  return (
+    <div className="flex flex-col gap-3">
+      {buttons.map((btn) => (
+        <button
+          key={btn.id}
+          onMouseEnter={() => onHover(btn.id)}
+          onMouseLeave={() => onHover(null)}
+          className={`
+            relative px-4 py-3 rounded-xl flex items-center gap-3
+            transition-all duration-300 group
+            bg-stonic-surface/30 border border-stonic-border/20
+            hover:border-stonic-primary/40 hover:bg-stonic-surfaceHover/30
+          `}
+        >
+          {/* Connection line from button */}
+          <div className="absolute right-0 top-1/2 -translate-y-1/2 w-8 h-px bg-gradient-to-r from-stonic-border/50 to-transparent" />
+          
+          {/* Icon */}
+          <div className={`
+            w-8 h-8 rounded-lg flex items-center justify-center
+            ${btn.color === 'cyan' ? 'bg-stonic-primary/20 text-stonic-primary' : ''}
+            ${btn.color === 'red' ? 'bg-red-500/20 text-red-400' : ''}
+            ${btn.color === 'blue' ? 'bg-blue-500/20 text-blue-400' : ''}
+            ${btn.color === 'purple' ? 'bg-purple-500/20 text-purple-400' : ''}
+          `}>
+            {btn.icon}
+          </div>
+          
+          {/* Text */}
+          <div className="flex flex-col items-start">
+            <span className="text-[10px] font-bold tracking-wider text-stonic-text group-hover:text-stonic-primary transition-colors">
+              {btn.label}
+            </span>
+            <span className="text-[7px] text-stonic-textDim tracking-wider">
+              {btn.subtitle}
+            </span>
+          </div>
+          
+          {/* Hover glow effect */}
+          <div 
+            className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+            style={{ 
+              background: `radial-gradient(circle at left center, ${btn.glowColor}, transparent 70%)`,
+            }}
+          />
+        </button>
+      ))}
+    </div>
+  );
+};
+
+// Connection Lines SVG
+const ConnectionLines: React.FC<{ activeButton: string | null }> = ({ activeButton }) => {
+  const getPath = (buttonId: string) => {
+    // Different curve paths for each button
+    const paths: Record<string, string> = {
+      'addfiles': 'M 0,20 Q 100,20 200,80',
+      'memory': 'M 0,55 Q 80,55 200,100',
+      'history': 'M 0,90 Q 60,90 200,120',
+      'user': 'M 0,125 Q 40,125 200,140',
+    };
+    return paths[buttonId] || '';
+  };
+
+  return (
+    <svg className="absolute left-48 top-0 w-64 h-full pointer-events-none z-10" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="rgba(0, 212, 255, 0.6)" />
+          <stop offset="50%" stopColor="rgba(0, 245, 212, 0.4)" />
+          <stop offset="100%" stopColor="rgba(0, 212, 255, 0)" />
+        </linearGradient>
+        <linearGradient id="redGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="rgba(239, 68, 68, 0.6)" />
+          <stop offset="50%" stopColor="rgba(239, 68, 68, 0.4)" />
+          <stop offset="100%" stopColor="rgba(0, 212, 255, 0)" />
+        </linearGradient>
+      </defs>
+      
+      {/* Default subtle connection lines */}
+      <path 
+        d="M 0,20 Q 100,20 200,80" 
+        fill="none" 
+        stroke="rgba(0, 212, 255, 0.1)" 
+        strokeWidth="1"
+      />
+      <path 
+        d="M 0,55 Q 80,55 200,100" 
+        fill="none" 
+        stroke="rgba(239, 68, 68, 0.1)" 
+        strokeWidth="1"
+      />
+      <path 
+        d="M 0,90 Q 60,90 200,120" 
+        fill="none" 
+        stroke="rgba(0, 212, 255, 0.1)" 
+        strokeWidth="1"
+      />
+      <path 
+        d="M 0,125 Q 40,125 200,140" 
+        fill="none" 
+        stroke="rgba(0, 212, 255, 0.1)" 
+        strokeWidth="1"
+      />
+      
+      {/* Active glow lines */}
+      {activeButton && (
+        <path 
+          d={getPath(activeButton)} 
+          fill="none" 
+          stroke={activeButton === 'memory' ? 'url(#redGradient)' : 'url(#lineGradient)'} 
+          strokeWidth="2"
+          className="animate-pulse"
+          filter="drop-shadow(0 0 4px rgba(0, 212, 255, 0.8))"
+        />
+      )}
+    </svg>
+  );
+};
+
+export const CenterHubExact: React.FC = () => {
+  const [initializing, setInitializing] = useState(false);
+  const [aiActive, setAiActive] = useState(false);
+  const [hoveredButton, setHoveredButton] = useState<string | null>(null);
+
+  const handleInitialize = () => {
+    setInitializing(true);
+    setTimeout(() => {
+      setInitializing(false);
+      setAiActive(true);
+    }, 3000);
+  };
+
+  return (
+    <div className="flex-1 flex gap-6 min-h-0">
+      {/* Left Panel - Vertical Buttons */}
+      <div className="flex flex-col justify-center">
+        <LeftPanelButtons />
+      </div>
+
+      {/* Center - Action Buttons with Connection Lines */}
+      <div className="flex flex-col justify-center relative">
+        <CenterActionButtons onHover={setHoveredButton} />
+        <ConnectionLines activeButton={hoveredButton} />
+      </div>
+
+      {/* Right Panel - Wireframe Sphere */}
+      <div className="flex-1 flex flex-col relative">
+        {/* Sphere Container */}
+        <div className="flex-1 relative">
+          <WireframeSphere initializing={initializing} />
+          
+          {/* STANDBY MODE Text */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+            <span className="text-[10px] text-stonic-textDim tracking-[0.3em] uppercase mb-4">
+              {initializing ? 'INITIALIZING...' : aiActive ? 'AI ACTIVE' : 'STANDBY MODE'}
+            </span>
+          </div>
+        </div>
+
+        {/* Initialize AI Button - Bottom Center */}
+        <div className="flex justify-center pb-4">
+          <button
+            onClick={handleInitialize}
+            disabled={initializing || aiActive}
+            className={`
+              px-8 py-3 rounded-full font-semibold text-xs tracking-[0.2em]
+              transition-all duration-500 flex items-center gap-3
+              border-2
+              ${aiActive 
+                ? 'bg-stonic-success/10 border-stonic-success text-stonic-success shadow-[0_0_20px_rgba(0,245,150,0.3)]' 
+                : 'bg-stonic-primary/10 border-stonic-primary text-stonic-primary hover:bg-stonic-primary/20 hover:shadow-[0_0_30px_rgba(0,212,255,0.4)]'
+              }
+              ${initializing ? 'cursor-wait' : ''}
+            `}
+          >
+            {initializing ? (
+              <>
+                <Loader2 size={14} className="animate-spin" />
+                <span>INITIALIZE AI</span>
+              </>
+            ) : aiActive ? (
+              <>
+                <div className="w-2 h-2 rounded-full bg-stonic-success animate-pulse" />
+                <span>SYSTEM ACTIVE</span>
+              </>
+            ) : (
+              <>
+                <Zap size={14} />
+                <span>INITIALIZE AI</span>
+              </>
+            )}
+          </button>
+        </div>
+
+        {/* Corner decorations */}
+        <div className="absolute top-0 left-0 w-4 h-4 border-t border-l border-stonic-primary/20" />
+        <div className="absolute top-0 right-0 w-4 h-4 border-t border-r border-stonic-primary/20" />
+        <div className="absolute bottom-0 left-0 w-4 h-4 border-b border-l border-stonic-primary/20" />
+        <div className="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-stonic-primary/20" />
+      </div>
+    </div>
+  );
+};

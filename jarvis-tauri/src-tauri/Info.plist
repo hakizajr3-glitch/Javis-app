@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>NSMicrophoneUsageDescription</key>
+  <string>JARVIS needs microphone access to hear your voice commands.</string>
+  <key>NSSpeechRecognitionUsageDescription</key>
+  <string>JARVIS needs speech recognition to transcribe your voice.</string>
+  <key>NSCameraUsageDescription</key>
+  <string>JARVIS uses the camera for visual input, motion detection, and avatar/vision features.</string>
+</dict>
+</plist>
