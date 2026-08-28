@@ -54,7 +54,7 @@ jobs:
           targets: ${{ matrix.target }}
 
       - name: Install all dependencies (pnpm workspace)
-        run: pnpm install --no-frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Build Tauri app (${{ matrix.target }})
         run: cd jarvis-tauri && pnpm tauri build --target ${{ matrix.target }}
