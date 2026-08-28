@@ -23,8 +23,8 @@ jobs:
       - name: Install pnpm
         run: npm install -g pnpm@latest
 
-      - name: Install dependencies
-        run: cd jarvis-core && pnpm install --no-frozen-lockfile
+      - name: Install dependencies (pnpm workspace)
+        run: pnpm install --no-frozen-lockfile
 
       - name: Run tests
         run: cd jarvis-core && npx vitest run
@@ -43,11 +43,8 @@ jobs:
       - name: Install pnpm
         run: npm install -g pnpm@latest
 
-      - name: Install jarvis-core dependencies
-        run: cd jarvis-core && pnpm install --no-frozen-lockfile
-
-      - name: Install jarvis-tauri dependencies
-        run: cd jarvis-tauri && pnpm install --no-frozen-lockfile
+      - name: Install dependencies (pnpm workspace)
+        run: pnpm install --no-frozen-lockfile
 
       - name: Build frontend
         run: cd jarvis-tauri && npx vite build
@@ -69,11 +66,8 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Install jarvis-core dependencies
-        run: cd jarvis-core && pnpm install --no-frozen-lockfile
-
-      - name: Install jarvis-tauri dependencies
-        run: cd jarvis-tauri && pnpm install --no-frozen-lockfile
+      - name: Install dependencies (pnpm workspace)
+        run: pnpm install --no-frozen-lockfile
 
       - name: Build Tauri app
         run: cd jarvis-tauri && pnpm tauri build --target aarch64-apple-darwin
